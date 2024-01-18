@@ -37,9 +37,6 @@ jobs:
         uses: samuelmeuli/action-snapcraft@v2
         # Only install Snapcraft on Ubuntu
         if: startsWith(matrix.os, 'ubuntu')
-        with:
-          # Log in to Snap Store
-          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_TOKEN }}
 
       # - name: Install AzureSignTool
       #  # Only install Azure Sign Tool on Windows
@@ -95,6 +92,8 @@ jobs:
           # macOS notarization API key
           API_KEY_ID: ${{ secrets.mac_api_key_id }}
           API_KEY_ISSUER_ID: ${{ secrets.mac_api_key_issuer_id }}
+          # Login to Snap Store
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_TOKEN }}
           
       # - name: Build Electron app (Windows)
       #   if: startsWith(matrix.os, 'windows')
