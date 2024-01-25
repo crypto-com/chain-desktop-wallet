@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v1.4.8] - 2024-01-25
+### Additions
+- Security enhancement & package dependencies bump
+### Bug Fixes
+- Bridge Transfer failure from Cronos to Cronos POS Chain 
 ## [v1.4.7] - 2024-01-16
 ### Additions
 - Security enhancement on DApp Browser
