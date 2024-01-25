@@ -121,7 +121,7 @@ export class BridgeService {
     const gasLimit = loadedBridgeConfig.gasLimit || defaultBridgeConfig.gasLimit;
 
     const contract = new web3.eth.Contract(bridgeContractABI, bridgeContractAddress);
-    const encodedABI = contract.methods.send_cro_to_CRONOS_TENDERMINT(recipientAddress).encodeABI();
+    const encodedABI = contract.methods.send_cro_to_crypto_org(recipientAddress).encodeABI();
 
     const scaledBaseAmount = getBaseScaledAmount(bridgeTransferRequest.amount, originAsset);
 
