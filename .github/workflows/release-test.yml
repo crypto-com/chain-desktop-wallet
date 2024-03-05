@@ -1,4 +1,4 @@
-# Only run on feat/windows-cert-signing push
+# Only run on master push
 name: Release Executables Binaries
 
 on:
@@ -27,21 +27,19 @@ jobs:
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v1
         with:
-          node-version: 18
+          node-version: 16
 
       - name: Install deps with big timeout
         run: |
           yarn install --network-timeout 600000
+
       - name: Install Snapcraft
-        uses: samuelmeuli/action-snapcraft@v1
+        uses: samuelmeuli/action-snapcraft@v2
         # Only install Snapcraft on Ubuntu
         if: startsWith(matrix.os, 'ubuntu')
-        with:
-          # Log in to Snap Store
-          snapcraft_token: ${{ secrets.snapcraft_token }}
 
       - name: Install AzureSignTool
-        # Only install Azure Sign Tool on Windows
+       # Only install Azure Sign Tool on Windows
         if: startsWith(matrix.os, 'windows')
         run: dotnet tool install --global AzureSignTool
 
@@ -65,12 +63,14 @@ jobs:
           echo name: ${{ steps.package_json.outputs.name }}
           echo version: ${{ steps.package_json.outputs.version }}
           echo "********* END RELEASE REF ************"
+
       - name: Prepare for app notarization (MacOS)
         if: startsWith(matrix.os, 'macos')
         # Import Apple API key for app notarization on macOS
         run: |
           mkdir -p ~/private_keys/
           echo '${{ secrets.mac_api_key }}' > ~/private_keys/AuthKey_${{ secrets.mac_api_key_id }}.p8
+
       - name: Build/release Electron app (MacOS, Ubuntu, Windows)
         uses: samuelmeuli/action-electron-builder@v1
         if: startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')
@@ -92,11 +92,14 @@ jobs:
           # macOS notarization API key
           API_KEY_ID: ${{ secrets.mac_api_key_id }}
           API_KEY_ISSUER_ID: ${{ secrets.mac_api_key_issuer_id }}
-
+          # Login to Snap Store
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_TOKEN }}
+          
       - name: Build Electron app (Windows)
         if: startsWith(matrix.os, 'windows')
         run: |
           yarn run electron:build
+
       - name: Sign built binary (Windows)
         if: startsWith(matrix.os, 'windows')
         # Instead of pointing to a specific .exe, uses a PowerShell script which iterates through all the files stored in dist folder. 
@@ -106,6 +109,7 @@ jobs:
               $exePath = $_.FullName
               & AzureSignTool sign -kvu "${{ secrets.azure_key_vault_url }}" -kvi "${{ secrets.azure_key_vault_client_id }}" -kvt "${{ secrets.azure_key_vault_tenant_id }}" -kvs "${{ secrets.azure_key_vault_client_secret }}" -kvc "${{ secrets.azure_key_vault_name }}" -tr http://timestamp.digicert.com -v $exePath
               }; cd ..
+
       - name: Cleanup artifacts (Windows)
         if: startsWith(matrix.os, 'windows')
         run: |
@@ -114,6 +118,7 @@ jobs:
           npx rimraf "dist/.icon-ico"
           mv dist/temp/* dist
           npx rimraf "dist/temp"
+
       - name: Upload artifacts (Windows)
         uses: actions/upload-artifact@v2
         if: startsWith(matrix.os, 'windows')
