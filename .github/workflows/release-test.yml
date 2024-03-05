@@ -71,7 +71,7 @@ jobs:
           mkdir -p ~/private_keys/
           echo '${{ secrets.mac_api_key }}' > ~/private_keys/AuthKey_${{ secrets.mac_api_key_id }}.p8
 
-      - name: Build/release Electron app (MacOS, Ubuntu, Windows)
+      - name: Build/release Electron app (MacOS, Ubuntu)
         uses: samuelmeuli/action-electron-builder@v1
         if: startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')
         with:
@@ -98,7 +98,7 @@ jobs:
       - name: Build Electron app (Windows)
         if: startsWith(matrix.os, 'windows')
         run: |
-          yarn run electron:build
+          yarn run electron:winbuild
 
       - name: Sign built binary (Windows)
         if: startsWith(matrix.os, 'windows')
