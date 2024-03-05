@@ -1,6 +1,6 @@
 {
   "name": "chain-desktop-wallet",
-  "version": "1.4.8",
+  "version": "0.0.0",
   "description": "Crypto.com DeFi Desktop Wallet App",
   "repository": "github:crypto-com/chain-desktop-wallet",
   "author": "Crypto.com <contact@crypto.com>",
@@ -9,7 +9,7 @@
   "main": "build/electron/main.js",
   "private": true,
   "scripts": {
-    "run-audit": "yarn audit-ci --high -a 1094574 1094894",
+    "run-audit": "yarn audit-ci --high -a 1094574 1096494",
     "start": "node scripts/start.js",
     "build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 && yarn clean-builds && node scripts/build.js",
     "test": "node scripts/test.js --watchAll=false",
@@ -394,6 +394,7 @@
     "word-wrap": "1.2.4",
     "@babel/traverse": "7.23.2",
     "get-func-name": "2.0.0",
-    "browserify-sign": "4.2.2"
+    "browserify-sign": "4.2.2",
+    "app-builder-lib": "24.13.2"
   }
 }
