@@ -25,6 +25,7 @@ import ErrorModalPopup from '../../../components/ErrorModalPopup/ErrorModalPopup
 import { useAddChainModal } from '../hooks/useAddChainModal';
 import { useSwitchChainModal } from '../hooks/useSwitchChainModal';
 import { EVMChainConfig } from '../../../models/Chain';
+import { ipcRenderer } from 'electron';
 
 // use **only** one of the following
 // priority: dapp > dappURL
@@ -119,6 +120,12 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
     successCallback: ConfirmTransactionSuccessCallback;
     errorCallback: Function;
   }>();
+
+  useEffect(() => {
+    if (isDOMReady && cronosAsset) {
+      webviewRef.current?.send('getAddress', [cronosAsset.address!]);
+    }
+  }, [cronosAsset, isDOMReady]);
 
   const onRequestAddress = useRefCallback((onSuccess: (address: string) => void) => {
     onSuccess(cronosAsset?.address!);
@@ -425,7 +432,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
         preload={ProviderPreloadScriptPath}
         ref={webviewRef}
         allowpopups={'true' as any}
-        webpreferences="contextIsolation=false, nodeIntegration=false, javascript=yes, allowpopup=yes"
+        webpreferences="contextIsolation=true, nodeIntegration=false, javascript=yes, allowpopup=yes"
         useragent={window.navigator.userAgent.replace(
           'chain-desktop-wallet',
           'Desktop Wallet Build',
