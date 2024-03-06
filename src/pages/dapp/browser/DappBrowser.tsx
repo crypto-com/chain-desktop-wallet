@@ -25,7 +25,6 @@ import ErrorModalPopup from '../../../components/ErrorModalPopup/ErrorModalPopup
 import { useAddChainModal } from '../hooks/useAddChainModal';
 import { useSwitchChainModal } from '../hooks/useSwitchChainModal';
 import { EVMChainConfig } from '../../../models/Chain';
-import { ipcRenderer } from 'electron';
 
 // use **only** one of the following
 // priority: dapp > dappURL
