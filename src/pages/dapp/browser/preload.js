@@ -1,7 +1,6 @@
 // !! if you change the location of this file, remember to change `extraResources` in package.json as well !!
 /* eslint-disable max-classes-per-file */
 /* eslint-disable */
-const { Buffer } = require('buffer');
 const { ipcRenderer, contextBridge } = require('electron');
 const EventEmitter = require('events');
 
