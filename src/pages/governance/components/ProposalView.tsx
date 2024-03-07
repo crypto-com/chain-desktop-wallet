@@ -4,7 +4,7 @@ import Big from 'big.js';
 import '../governance.less';
 import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Layout, Radio, Button, Card, Progress, Form, InputNumber, Spin } from 'antd';
+import { Layout, Radio, Button, Card, Progress, Form, InputNumber, Spin, Alert } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
@@ -307,11 +307,22 @@ export const ProposalView = (props: any) => {
                 {allProps?.proposal?.proposal_id}
               </div>
             </div>
-
+            {allProps.proposal?.content?.description.includes('http') ? 
+              <div className="warning">
+                <Alert
+                  type="warning"
+                  message={t('governance.warning')}
+                  showIcon
+                />
+              </div>
+              : <></>}
             <div className="description">
-              {allProps.proposal?.content?.description ? allProps.proposal?.content.description.split('\\n').map((p, i) => (
-                <p key={i}>{p}</p>
-              )) : <p key={0}>(No description)</p>}
+              {allProps.proposal?.content?.description ? 
+                allProps.proposal?.content.description.split(/\n|\\n/).map((p, i) => (
+                  <p key={i}>{p}</p>
+                )) 
+                : <p key={0}>(No description)</p>
+              }
             </div>
             <div className="item">
               {allProps.proposal?.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD ? (
