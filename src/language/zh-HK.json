@@ -592,6 +592,7 @@
   "staking.modal6.note.part5": "以完成此交易",
   "governance.title": "治理",
   "governance.description": "你可以在這裡看到所有提案並行使你的投票權。",
+  "governance.warning": "此提案包含可能導向可疑網站的外部連結。請謹慎開啟。",
   "governance.votingHistoryBtn": "查看投票歷史",
   "governance.tab1": "所有",
   "governance.tab2": "投票中",

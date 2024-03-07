@@ -592,6 +592,7 @@
   "staking.modal6.note.part5": "in order to broadcast this transaction successfully",
   "governance.title": "Governance",
   "governance.description": "You may see all proposals and cast your votes here.",
+  "governance.warning": "This proposal contains external links that may lead to suspicious websites. Please open with caution.",
   "governance.votingHistoryBtn": "View Voting History",
   "governance.tab1": "All",
   "governance.tab2": "Voting",
