@@ -120,6 +120,12 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
     errorCallback: Function;
   }>();
 
+  useEffect(() => {
+    if (isDOMReady && cronosAsset) {
+      webviewRef.current?.send('getAddress', [cronosAsset.address!]);
+    }
+  }, [cronosAsset, isDOMReady]);
+
   const onRequestAddress = useRefCallback((onSuccess: (address: string) => void) => {
     onSuccess(cronosAsset?.address!);
   });
@@ -425,7 +431,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
         preload={ProviderPreloadScriptPath}
         ref={webviewRef}
         allowpopups={'true' as any}
-        webpreferences="contextIsolation=false, nodeIntegration=false, javascript=yes, allowpopup=yes"
+        webpreferences="contextIsolation=true, sandbox=true, nodeIntegration=false, javascript=yes, allowpopup=yes"
         useragent={window.navigator.userAgent.replace(
           'chain-desktop-wallet',
           'Desktop Wallet Build',
