@@ -555,13 +555,6 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
             }
           }
           break;
-        case 'openLinkInDefaultBrowser':
-          {
-            const { url } = event.object;
-            const { shell } = window.require('electron');
-            shell.openExternal(url);
-          }
-          break;
         default:
           break;
       }
