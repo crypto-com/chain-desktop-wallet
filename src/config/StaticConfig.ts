@@ -356,7 +356,7 @@ const TestNetConfig: WalletConfig = {
 };
 
 const TestnetCroeseid4: Network = {
-  defaultNodeUrl: 'https://rpc-testnet-croeseid-4.crypto.org',
+  defaultNodeUrl: 'https://rpc-testnet-croeseid-4.cronos-pos.org',
   chainId: 'testnet-croeseid-4',
   addressPrefix: 'tcro',
   validatorAddressPrefix: 'tcrocncl',
@@ -369,11 +369,11 @@ const TestnetCroeseid4: Network = {
     coinType: 1,
     account: 0,
   },
-  rpcUrl: 'https://rpc-testnet-croeseid-4.crypto.org',
+  rpcUrl: 'https://rpc-testnet-croeseid-4.cronos-pos.org',
 };
 
 const TestnetCroeseid5: Network = {
-  defaultNodeUrl: 'https://rpc-c5.crypto.org',
+  defaultNodeUrl: 'https://rpc-c5.cronos-pos.org',
   chainId: 'testnet-croeseid-5',
   addressPrefix: 'tcro',
   validatorAddressPrefix: 'tcrocncl',
@@ -386,7 +386,7 @@ const TestnetCroeseid5: Network = {
     coinType: 1,
     account: 0,
   },
-  rpcUrl: 'https://rpc-c5.crypto.org',
+  rpcUrl: 'https://rpc-c5.cronos-pos.org',
 };
 
 export const TestNetCroeseid4Config: WalletConfig = {
@@ -414,8 +414,8 @@ export const TestNetCroeseid4Config: WalletConfig = {
     ...TestnetCroeseid4,
     chainName: SupportedChainName.CRONOS_TENDERMINT,
     node: {
-      clientUrl: 'https://rpc-testnet-croeseid-4.crypto.org',
-      proxyUrl: 'https://rest-testnet-croeseid-4.crypto.org',
+      clientUrl: 'https://rpc-testnet-croeseid-4.cronos-pos.org',
+      proxyUrl: 'https://rest-testnet-croeseid-4.cronos-pos.org',
     }
   }
 };
@@ -446,8 +446,8 @@ export const TestNetCroeseid5Config: WalletConfig = {
     ...TestnetCroeseid5,
     chainName: SupportedChainName.CRONOS_TENDERMINT,
     node: {
-      clientUrl: 'https://rpc-c5.crypto.org',
-      proxyUrl: 'https://rest-c5.crypto.org'
+      clientUrl: 'https://rpc-c5.cronos-pos.org',
+      proxyUrl: 'https://rest-c5.cronos-pos.org'
     }
   }
 };
@@ -456,7 +456,7 @@ export const MainNetConfig: WalletConfig = {
   enabled: true,
   name: NetworkName.MAINNET,
   derivationPath: 'm/44\'/394\'/0\'/0/0',
-  nodeUrl: 'https://rpc.mainnet.crypto.org',
+  nodeUrl: 'https://rpc.mainnet.cronos-pos.org',
   explorer: {
     baseUrl: 'https://cronos-pos.org/explorer/',
     tx: 'https://cronos-pos.org/explorer/tx',
@@ -467,8 +467,8 @@ export const MainNetConfig: WalletConfig = {
   indexingUrl: 'https://cronos-pos.org/explorer/api/v1/',
   network: {
     ...CroNetwork.Mainnet,
-    defaultNodeUrl: 'https://rpc.mainnet.crypto.org',
-    rpcUrl: 'https://rpc.mainnet.crypto.org',
+    defaultNodeUrl: 'https://rpc.mainnet.cronos-pos.org',
+    rpcUrl: 'https://rpc.mainnet.cronos-pos.org',
   },
   disableDefaultClientMemo: false,
   enableGeneralSettings: false,
@@ -479,12 +479,12 @@ export const MainNetConfig: WalletConfig = {
   },
   tendermintNetwork: {
     ...CroNetwork.Mainnet,
-    defaultNodeUrl: 'https://rpc.mainnet.crypto.org',
+    defaultNodeUrl: 'https://rpc.mainnet.cronos-pos.org',
     chainName: SupportedChainName.CRONOS_TENDERMINT,
-    rpcUrl: 'https://rpc.mainnet.crypto.org',
+    rpcUrl: 'https://rpc.mainnet.cronos-pos.org',
     node: {
-      clientUrl: 'https://rpc.mainnet.crypto.org',
-      proxyUrl: 'https://rest.mainnet.crypto.org',
+      clientUrl: 'https://rpc.mainnet.cronos-pos.org',
+      proxyUrl: 'https://rest.mainnet.cronos-pos.org',
     },
   },
 };

@@ -359,7 +359,7 @@ describe('Testing Full Storage Service', () => {
     const dataSettings: SettingsDataUpdate = {
       chainId: 'testnet-xxx-2',
       gasLimit: '330000',
-      indexingUrl: 'https://crypto.org/explorer/croeseid/api/v1/',
+      indexingUrl: 'https://cronos-pos.org/explorer/croeseid/api/v1/',
       networkFee: '12020',
       nodeUrl: 'https://www.new-node-url-croeseid.crypto.org',
       walletId: walletTestnet1ID,
@@ -390,7 +390,7 @@ describe('Testing Full Storage Service', () => {
     const dataSettingsMainnet: SettingsDataUpdate = {
       chainId: 'MainnetZZ-ChainID',
       gasLimit: '3300022',
-      indexingUrl: 'https://crypto.org/explorer/mainnet/api/v1/',
+      indexingUrl: 'https://cronos-pos.org/explorer/mainnet/api/v1/',
       networkFee: '12022',
       nodeUrl: 'https://www.new-node-url-mainnet.crypto.org',
       walletId: walletMainnet1ID,
