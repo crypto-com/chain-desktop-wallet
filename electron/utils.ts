@@ -1,11 +1,42 @@
-export function isValidURL(str: string) {
-    const regex = new RegExp(
-      '^(http[s]?:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?', // lgtm [js/redos]
-    );
-  
-    const withoutPrefixRegex = new RegExp(
-      '^([0-9A-Za-z-\\.@:%_+~#=]+)+((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?', // lgtm [js/redos]
-    );
-    return regex.test(str) || withoutPrefixRegex.test(str);
+import { URL } from "url";
+
+function isValidDomain(domain: string) {
+  const parts = domain.split('.');
+  if (parts.length < 2) {
+    return false;
+  }
+
+  for (const part of parts) {
+    if (part.length === 0) {
+      return false;
+    }
+  }
+
+  return true;
 }
-  
+
+export function isValidURL(str: string) {
+  const count = str.split(':').length - 1;
+  if (count > 1) {
+    return false;
+  }
+
+  let urlTest: URL;
+  try {
+    if (count == 0 && isValidDomain(str)) {
+      urlTest = new URL('https://' + str);
+    } else {
+      urlTest = new URL(str);
+    }
+  } catch (_) {
+    return false;
+  }
+
+  if (urlTest.protocol === 'http:' || urlTest.protocol === 'https:') {
+    return true;
+  } else if (urlTest.protocol === 'http' || urlTest.protocol === 'https') {
+    return true;
+  } else {
+    return false;
+  }
+}

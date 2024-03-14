@@ -13,7 +13,7 @@ import logoFerroProtocol from './assets/ferro.png';
 
 import AddressBar from './components/AddressBar/AddressBar';
 import SavedTab from './components/Tabs/SavedTab';
-import { isLocalhostURL, isValidURL } from '../../utils/utils';
+import { isValidURL } from '../../utils/utils';
 import { IWebviewNavigationState, WebviewState } from './browser/useWebviewStatusInfo';
 import { useBookmark } from './hooks/useBookmark';
 import { useShowDisclaimer } from './hooks/useShowDisclaimer';
@@ -242,8 +242,7 @@ const DappPage = () => {
         }}
         onSearch={value => {
           setSelectedDapp(undefined);
-          // detect whether it's a domain
-          if (isValidURL(value) || isLocalhostURL(value)) {
+          if (isValidURL(value)) {
             // jump to website
             setSelectedURL(value);
           } else {
