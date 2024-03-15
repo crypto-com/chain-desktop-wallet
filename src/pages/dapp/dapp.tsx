@@ -242,12 +242,13 @@ const DappPage = () => {
         }}
         onSearch={value => {
           setSelectedDapp(undefined);
-          if (isValidURL(value)) {
+          const { isValid, finalURL } = isValidURL(value);
+          if (isValid) {
             // jump to website
-            setSelectedURL(value);
+            setSelectedURL(finalURL);
           } else {
             // google search
-            setSelectedURL(`https://www.google.com/search?q=${value}`);
+            setSelectedURL(`https://www.google.com/search?q=${finalURL}`);
           }
         }}
       />
