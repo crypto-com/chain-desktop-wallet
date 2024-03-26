@@ -313,9 +313,9 @@ interface ValidURLCheckResult {
 
 export function isValidURL(str: string): ValidURLCheckResult {
   try {
-    if (!str.startsWith('https://') && !str.startsWith('http://')) {
-      str = 'https://' + str;
-    }
+    // if (!str.startsWith('https://') && !str.startsWith('http://')) {
+    //   str = 'https://' + str;
+    // }
     const parsedUrl = new URL(str);
     const regex = /^([a-zA-Z0-9-_.:]+)+$/;
     return {

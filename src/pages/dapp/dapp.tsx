@@ -246,10 +246,11 @@ const DappPage = () => {
           if (isValid) {
             // jump to website
             setSelectedURL(finalURL);
-          } else {
-            // google search
-            setSelectedURL(`https://www.google.com/search?q=${finalURL}`);
           }
+          //  else {
+          //   // google search
+          //   setSelectedURL(`https://www.google.com/search?q=${finalURL}`);
+          // }
         }}
       />
       {shouldShowBrowser && (
