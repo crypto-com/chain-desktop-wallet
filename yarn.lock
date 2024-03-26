@@ -20004,7 +20004,7 @@ web3-shh@1.5.2:
 
 web3-utils@1.5.0:
   version "1.5.0"
-  resolved "https://registry.npmjs.org/web3-utils/-/web3-utils-1.5.0.tgz"
+  resolved "https://registry.yarnpkg.com/web3-utils/-/web3-utils-1.5.0.tgz#48c8ba0d95694e73b9a6d473d955880cd4758e4a"
   integrity sha512-hNyw7Oxi6TM3ivXmv4hK5Cvyi9ML3UoKtcCYvLF9woPWh5v2dwCCVO1U3Iq5HHK7Dqq28t1d4CxWHqUfOfAkgg==
   dependencies:
     bn.js "^4.11.9"
