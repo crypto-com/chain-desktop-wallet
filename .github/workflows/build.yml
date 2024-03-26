@@ -31,8 +31,13 @@ jobs:
         run: |
           yarn install --network-timeout 600000
 
-      - name: Build App Binaries
+      - name: Build App Binaries (MacOS, Ubuntu)
+        if: startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')
         run: |
           yarn electron:build
 
+      - name: Build App Binaries (Windows)
+        if: startsWith(matrix.os, 'windows')
+        run: |
+          yarn electron:winbuild
 
