@@ -210,9 +210,9 @@ export function getChainName(name: string | undefined = '', config: WalletConfig
         return name.replace('Chain', 'Goerli Testnet');
 
       case SupportedChainName.CRONOS_TENDERMINT: {
-        if(config.network.chainId.indexOf('croeseid-4') !== -1)
+        if (config.network.chainId.indexOf('croeseid-4') !== -1)
           return name.replace('Chain', 'Testnet Croeseid 4');
-          
+
         return name.replace('Chain', 'Testnet Croeseid 5');
       }
       default:
@@ -306,16 +306,27 @@ export function isLocalhostURL(str: string) {
   }
 }
 
-export function isValidURL(str: string) {
-  const regex = new RegExp(
-    '^(http[s]?:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?', // lgtm [js/redos]
-  );
-
-  const withoutPrefixRegex = new RegExp(
-    '^([0-9A-Za-z-\\.@:%_+~#=]+)+((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?', // lgtm [js/redos]
-  );
-  return regex.test(str) || withoutPrefixRegex.test(str);
+interface ValidURLCheckResult {
+  isValid: boolean;
+  finalURL: string;
 }
+
+export function isValidURL(str: string): ValidURLCheckResult {
+  try {
+    // if (!str.startsWith('https://') && !str.startsWith('http://')) {
+    //   str = 'https://' + str;
+    // }
+    const parsedUrl = new URL(str);
+    const regex = /^([a-zA-Z0-9-_.:]+)+$/;
+    return {
+      isValid: regex.test(parsedUrl.host),
+      finalURL: str
+    };
+  } catch (e) {
+    return { isValid: false, finalURL: str };
+  }
+}
+
 
 export function addHTTPsPrefixIfNeeded(str: string) {
   if (str.startsWith('http://') || str.startsWith('https://')) {
