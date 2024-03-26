@@ -141,10 +141,11 @@ function createWindow() {
   // Open default browser when direct to external
   win.webContents.on('new-window', function (e, url) {
     e.preventDefault();
-    if (!isValidURL(url)) {
+    const { isValid, finalURL } = isValidURL(url);
+    if (!isValid) {
       return;
     }
-    require('electron').shell.openExternal(url);
+    require('electron').shell.openExternal(finalURL);
   });
 
   // Hot Reloading
@@ -191,16 +192,17 @@ app.on('ready', async function () {
   await new Promise(resolve => setTimeout(resolve, 20_000));
 
   const autoUpdateExpireTime = store.get('autoUpdateExpireTime');
-  if(!autoUpdateExpireTime) {
+  if (!autoUpdateExpireTime) {
     autoUpdater.checkForUpdatesAndNotify();
   }
 });
 
 app.on('web-contents-created', (event, contents) => {
-  
+
   if (contents.getType() == 'window') {
     contents.on('will-navigate', (event, url) => {
-      if (!isValidURL(url)) {
+      const { isValid } = isValidURL(url);
+      if (!isValid) {
         event.preventDefault();
         return;
       }
@@ -211,38 +213,44 @@ app.on('web-contents-created', (event, contents) => {
     // blocks any new windows from being opened
     contents.setWindowOpenHandler((detail) => {
 
-      if (isValidURL(detail.url)) {
-        return {action: 'allow'};
+      const { isValid } = isValidURL(detail.url);
+
+      if (isValid) {
+        return { action: 'allow' };
       }
 
       console.log('open url reject, not valid', detail.url);
-      return {action: 'deny'};
+      return { action: 'deny' };
     })
-    
+
     // new-window api deprecated, but still working for now
     contents.on('new-window', (event, url, frameName, disposition, options) => {
       options.webPreferences = {
         ...options.webPreferences,
         javascript: false,
       };
-      
-      if (!isValidURL(url)) {
+
+      const { isValid, finalURL } = isValidURL(url);
+
+      if (!isValid) {
         event.preventDefault();
         return;
       }
 
-      require('electron').shell.openExternal(url);
+      require('electron').shell.openExternal(finalURL);
     })
 
     contents.on('will-navigate', (event, url) => {
-      if (!isValidURL(url)) {
+      const { isValid } = isValidURL(url);
+      if (!isValid) {
         event.preventDefault();
       }
     })
 
     // blocks 301/302 redirect if the url is not valid
     contents.on('will-redirect', (event, url) => {
-      if (!isValidURL(url)) {
+      const { isValid } = isValidURL(url);
+      if (!isValid) {
         event.preventDefault();
       }
     })

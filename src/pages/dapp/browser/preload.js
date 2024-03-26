@@ -1,8 +1,7 @@
 // !! if you change the location of this file, remember to change `extraResources` in package.json as well !!
 /* eslint-disable max-classes-per-file */
 /* eslint-disable */
-const { Buffer } = require('buffer');
-const { ipcRenderer } = require('electron');
+const { ipcRenderer, contextBridge } = require('electron');
 const EventEmitter = require('events');
 
 class RPCServer {
@@ -568,4 +567,107 @@ const providerConfig = {
   rpcUrl: 'https://evm.cronos.org',
   isDebug: true,
 };
-window.ethereum = new window.desktopWallet.Provider(providerConfig);
+
+const provider = new Web3Provider(providerConfig);
+
+ipcRenderer.on('getAddress', (event, args) => {
+  const address = args[0];
+
+  contextBridge.exposeInMainWorld('ethereum', {
+    address,
+    ready: true,
+    isDesktopWallet: true,
+    setConfig: (config, emitChanges) => {
+      provider.setConfig(config, emitChanges);
+    },
+    request: payload => {
+      return provider.request(payload);
+    },
+    setAddress: address => {
+      provider.setAddress(address);
+    },
+    sendResponse: (id, result) => {
+      provider.sendResponse(id, result);
+    },
+    sendError: (id, error) => {
+      provider.sendError(id, error);
+    },
+    eth_accounts: () => {
+      return provider.eth_accounts();
+    },
+    eth_coinbase: () => {
+      return provider.eth_coinbase();
+    },
+    net_version: () => {
+      return provider.net_version();
+    },
+    eth_chainId: () => {
+      return provider.eth_chainId();
+    },
+    eth_sign: payload => {
+      return provider.eth_sign(payload);
+    },
+    personal_sign: payload => {
+      return provider.personal_sign(payload);
+    },
+    personal_ecRecover: payload => {
+      return provider.personal_ecRecover(payload);
+    },
+    eth_signTypedData: (payload, useV4) => {
+      return provider.eth_signTypedData(payload, useV4);
+    },
+    eth_sendTransaction: payload => {
+      return provider.eth_sendTransaction(payload);
+    },
+    eth_requestAccounts: payload => {
+      return provider.eth_requestAccounts(payload);
+    },
+    wallet_watchAsset: payload => {
+      return provider.wallet_watchAsset(payload);
+    },
+    wallet_addEthereumChain: payload => {
+      return provider.wallet_addEthereumChain(payload);
+    },
+    wallet_switchEthereumChain: payload => {
+      return provider.wallet_switchEthereumChain(payload);
+    },
+    isConnected: () => {
+      return provider.isConnected();
+    },
+    enable: () => {
+      return provider.enable();
+    },
+    send: payload => {
+      return provider.send(payload);
+    },
+    sendAsync: (payload, callback) => {
+      return provider.sendAsync(payload, callback);
+    },
+    addEventListener: (event, callback) => {
+      provider.addListener(event, callback);
+    },
+    on: (event, callback) => {
+      provider.on(event, callback);
+    },
+    once: (event, callback) => {
+      provider.once(event, callback);
+    },
+    removeListener: (event, callback) => {
+      provider.removeListener(event, callback);
+    },
+    removeAllListeners: event => {
+      provider.removeAllListeners(event);
+    },
+    emit: (event, ...args) => {
+      provider.emit(event, ...args);
+    },
+  })
+  contextBridge.exposeInMainWorld('desktopWallet', {
+    Provider: Web3Provider,
+    postMessage: arg => {
+      ipcRenderer.sendToHost('dapp', arg);
+    },
+  })
+  
+})
+
