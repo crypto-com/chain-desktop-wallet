@@ -69,7 +69,7 @@ jobs:
         # Import Apple API key for app notarization on macOS
         run: |
           mkdir -p ~/private_keys/
-          echo '${{ secrets.mac_api_key }}' > ~/private_keys/AuthKey_${{ secrets.mac_api_key_id }}.p8
+          echo '${{ secrets.MAC_API_KEY }}' > ~/private_keys/AuthKey_${{ secrets.MAC_API_KEY_ID }}.p8
 
       - name: Build/release Electron app (MacOS, Ubuntu)
         uses: samuelmeuli/action-electron-builder@v1
@@ -80,18 +80,18 @@ jobs:
 
           # GitHub token, automatically provided to the action
           # (No need to define this secret in the repo settings)
-          github_token: ${{ secrets.github_token }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
           # When a push is done to master, the action builds binaries for all OS and they are then released directly
           release: ${{ steps.extract_branch.outputs.branch == 'feat/windows-cert-signing' }}
 
-          mac_certs: ${{ secrets.mac_certs }}
-          mac_certs_password: ${{ secrets.mac_certs_password }}
+          mac_certs: ${{ secrets.MAC_CERTS }}
+          mac_certs_password: ${{ secrets.MAC_CERTS_PASSWORD }}
 
         env:
           # macOS notarization API key
-          API_KEY_ID: ${{ secrets.mac_api_key_id }}
-          API_KEY_ISSUER_ID: ${{ secrets.mac_api_key_issuer_id }}
+          API_KEY_ID: ${{ secrets.MAC_API_KEY_ID }}
+          API_KEY_ISSUER_ID: ${{ secrets.MAC_API_KEY_ISSUER_ID }}
           # Login to Snap Store
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_TOKEN }}
           
