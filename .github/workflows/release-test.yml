@@ -24,10 +24,17 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v1
 
-      - name: Install Node.js, NPM and Yarn
+      - name: Install Node.js 18, NPM and Yarn (Ubuntu, Windows)
+        if: startsWith(matrix.os, 'ubuntu') | startsWith(matrix.os, 'windows')
         uses: actions/setup-node@v1
         with:
           node-version: 18
+
+      - name: Install Node.js 16, NPM and Yarn (MacOS)
+        if: startsWith(matrix.os, 'macos')
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16
 
       - name: Install deps with big timeout
         run: |
@@ -63,12 +70,6 @@ jobs:
           echo name: ${{ steps.package_json.outputs.name }}
           echo version: ${{ steps.package_json.outputs.version }}
           echo "********* END RELEASE REF ************"
-      
-      - name: Downgrade Node.js to 16 (MacOS)
-        if: startsWith(matrix.os, 'macos')
-        uses: actions/setup-node@v1
-        with:
-          node-version: 16
 
       - name: Prepare for app notarization (MacOS)
         if: startsWith(matrix.os, 'macos')
