@@ -63,6 +63,19 @@ jobs:
           echo name: ${{ steps.package_json.outputs.name }}
           echo version: ${{ steps.package_json.outputs.version }}
           echo "********* END RELEASE REF ************"
+      - name: Install Xcode Command Line Tools (MacOS)
+        if: startsWith(matrix.os, 'macos')
+        run: sudo xcode-select --install
+
+      - name: Import Apple Developer certificate (MacOS)
+        if: startsWith(matrix.os, 'macos')
+        run: |
+          echo ${{ secrets.mac_certs }} | base64 --decode > cert.p12
+          security create-keychain -p actions build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p actions build.keychain
+          security import cert.p12 -k build.keychain -P ${{ secrets.mac_certs_password }} -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k actions build.keychain
 
       - name: Prepare for app notarization (MacOS)
         if: startsWith(matrix.os, 'macos')
