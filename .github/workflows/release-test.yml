@@ -64,6 +64,12 @@ jobs:
           echo version: ${{ steps.package_json.outputs.version }}
           echo "********* END RELEASE REF ************"
       
+      - name: Downgrade Node.js to 16 (MacOS)
+        if: startsWith(matrix.os, 'macos')
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16
+
       - name: Prepare for app notarization (MacOS)
         if: startsWith(matrix.os, 'macos')
         # Import Apple API key for app notarization on macOS
@@ -71,9 +77,33 @@ jobs:
           mkdir -p ~/private_keys/
           echo '${{ secrets.MAC_API_KEY }}' > ~/private_keys/AuthKey_${{ secrets.MAC_API_KEY_ID }}.p8
 
-      - name: Build/release Electron app (MacOS, Ubuntu)
+      - name: Build/release Electron app (MacOS)
         uses: samuelmeuli/action-electron-builder@v1
-        if: startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')
+        if: startsWith(matrix.os, 'macos')
+        with:
+
+          build_script_name: electron:mac-pre-build
+
+          # GitHub token, automatically provided to the action
+          # (No need to define this secret in the repo settings)
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+          # When a push is done to master, the action builds binaries for all OS and they are then released directly
+          release: ${{ steps.extract_branch.outputs.branch == 'feat/windows-cert-signing' }}
+
+          mac_certs: ${{ secrets.MAC_CERTS }}
+          mac_certs_password: ${{ secrets.MAC_CERTS_PASSWORD }}
+
+        env:
+          # macOS notarization API key
+          API_KEY_ID: ${{ secrets.MAC_API_KEY_ID }}
+          API_KEY_ISSUER_ID: ${{ secrets.MAC_API_KEY_ISSUER_ID }}
+          # Login to Snap Store
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_TOKEN }}
+
+      - name: Build/release Electron app (Ubuntu)
+        uses: samuelmeuli/action-electron-builder@v1
+        if: startsWith(matrix.os, 'ubuntu')
         with:
 
           build_script_name: electron:pre-build

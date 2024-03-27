@@ -19,6 +19,7 @@
     "electron:devcore": "concurrently \"BROWSER=none yarn start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
     "electron:windev": "concurrently \"SET NODE_ENV=none && SET BROWSER=none && yarn start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
     "electron:pre-build": "NODE_OPTIONS=--openssl-legacy-provider yarn build && yarn copy-macos-manifest && tsc -p electron",
+    "electron:mac-pre-build": "yarn build && yarn copy-macos-manifest && tsc -p electron",
     "copy-macos-manifest": "copyfiles entitlements* ./build/",
     "clean-builds": "rimraf build && rimraf dist",
     "electron:build": "cross-env NODE_OPTIONS=\"--max_old_space_size=8192\" && yarn clean-builds && NODE_OPTIONS=--openssl-legacy-provider yarn build && yarn copy-macos-manifest && tsc -p electron && electron-builder --publish=never",
