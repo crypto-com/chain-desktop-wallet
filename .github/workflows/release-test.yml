@@ -63,9 +63,10 @@ jobs:
           echo name: ${{ steps.package_json.outputs.name }}
           echo version: ${{ steps.package_json.outputs.version }}
           echo "********* END RELEASE REF ************"
-      - name: Install Xcode Command Line Tools (MacOS)
-        if: startsWith(matrix.os, 'macos')
-        run: sudo xcode-select --install
+        
+      # - name: Update Xcode Command Line Tools (MacOS)
+      #   if: startsWith(matrix.os, 'macos')
+      #   run: softwareupdate --install -a
 
       - name: Import Apple Developer certificate (MacOS)
         if: startsWith(matrix.os, 'macos')
