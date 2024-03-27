@@ -63,21 +63,7 @@ jobs:
           echo name: ${{ steps.package_json.outputs.name }}
           echo version: ${{ steps.package_json.outputs.version }}
           echo "********* END RELEASE REF ************"
-        
-      # - name: Update Xcode Command Line Tools (MacOS)
-      #   if: startsWith(matrix.os, 'macos')
-      #   run: softwareupdate --install -a
-
-      - name: Import Apple Developer certificate (MacOS)
-        if: startsWith(matrix.os, 'macos')
-        run: |
-          echo ${{ secrets.mac_certs }} | base64 --decode > cert.p12
-          security create-keychain -p actions build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p actions build.keychain
-          security import cert.p12 -k build.keychain -P ${{ secrets.mac_certs_password }} -T /usr/bin/codesign
-          security set-key-partition-list -S apple-tool:,apple: -s -k actions build.keychain
-
+      
       - name: Prepare for app notarization (MacOS)
         if: startsWith(matrix.os, 'macos')
         # Import Apple API key for app notarization on macOS
@@ -97,7 +83,7 @@ jobs:
           github_token: ${{ secrets.github_token }}
 
           # When a push is done to master, the action builds binaries for all OS and they are then released directly
-          release: ${{ steps.extract_branch.outputs.branch == 'master' }}
+          release: ${{ steps.extract_branch.outputs.branch == 'feat/windows-cert-signing' }}
 
           mac_certs: ${{ secrets.mac_certs }}
           mac_certs_password: ${{ secrets.mac_certs_password }}
