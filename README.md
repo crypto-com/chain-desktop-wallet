@@ -63,7 +63,7 @@ Runs the Electron app in the development mode.
 
 The Electron app will reload if you make edits in the electron directory.
 You will also see any lint errors in the console.
-
+ 
 
 ```sh
 yarn electron:build
