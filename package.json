@@ -16,7 +16,7 @@
     "postinstall": "electron-builder install-app-deps",
     "vite:dev": "cross-env NODE_ENV=development && node scripts/watch.vite.mjs",
     "electron:dev": "export NODE_ENV=development && yarn electron:devcore",
-    "electron:devcore": "concurrently \"BROWSER=none yarn start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
+    "electron:devcore": "concurrently \"BROWSER=none && yarn start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
     "electron:windev": "concurrently \"SET NODE_ENV=none && SET BROWSER=none && yarn start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
     "electron:pre-build": "NODE_OPTIONS=--openssl-legacy-provider yarn build && yarn copy-macos-manifest && tsc -p electron",
     "electron:mac-pre-build": "yarn build && yarn copy-macos-manifest && tsc -p electron",
