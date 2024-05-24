@@ -228,6 +228,7 @@ function HomeLayout(props: HomeLayoutProps) {
     setWalletAllAssets(allAssets);
     setIsIbcVisible(isIbcVisible);
     walletService.syncAll(currentSession);
+    walletService.fetchAndSaveNFTs(currentSession);
 
     setIsButtonLoading(false);
     setIsConfirmationModalVisible(false);

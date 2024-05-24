@@ -193,7 +193,7 @@ class WalletService {
     await Promise.all([
       this.syncBalancesData(currentSession),
       this.syncTransactionsData(currentSession),
-      this.fetchAndSaveNFTs(currentSession),
+      // this.fetchAndSaveNFTs(currentSession),
       this.fetchAndSaveValidators(currentSession)
       // this.fetchIBCAssets(currentSession),
     ]);
@@ -766,6 +766,7 @@ class WalletService {
       const newSession = new Session({ ...wallet, config: config }, activeAsset);
       await this.setCurrentSession(newSession);
 
+      await this.fetchAndSaveNFTs(newSession);
       await this.syncAll(newSession);
     }
   }
