@@ -39,9 +39,16 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
   };
 
   getETHBalanceByAddress = async (address: string): Promise<string> => {
+    // v1
+    // const balanceResponse: AxiosResponse<BalancesByAddressResponse> = await axios({
+    //   baseURL: this.indexingBaseUrl,
+    //   url: `/address/${address.toLowerCase()}/balance`,
+    // });
+
+    // v2
     const balanceResponse: AxiosResponse<BalancesByAddressResponse> = await axios({
       baseURL: this.indexingBaseUrl,
-      url: `/address/${address.toLowerCase()}/balance`,
+      url: `/addresses/${address.toLowerCase()}/native_balance`,
     });
 
     if (balanceResponse.status !== 200) {
@@ -52,6 +59,12 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
       return '0';
     }
 
+    // v1
+    // const ethBalance = balanceResponse.data.data.assets
+    //   .find(asset => asset.token_addr === 'ETH')
+    //   ?.balance.toString();
+
+    // v2
     const ethBalance = balanceResponse.data.data.assets
       .find(asset => asset.token_addr === 'ETH')
       ?.balance.toString();
@@ -60,12 +73,20 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
   };
 
   getBalanceByAddress = async (address: string, options?: balanceQueryBaseParams) => {
+    // v1
+    // const balanceResponse: AxiosResponse<BalancesByAddressResponse> = await axios({
+    //   baseURL: this.indexingBaseUrl,
+    //   url: `/address/${address.toLowerCase()}/balance`,
+    //   params: { ...options },
+    // });
+
+    // v2
     const balanceResponse: AxiosResponse<BalancesByAddressResponse> = await axios({
       baseURL: this.indexingBaseUrl,
-      url: `/address/${address.toLowerCase()}/balance`,
+      url: `/addresses/${address.toLowerCase()}/token_balance`,
       params: { ...options },
     });
-
+    
     if (balanceResponse.status !== 200) {
       return [];
     }
@@ -109,9 +130,17 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
   };
 
   private getTxsByAddressPaginated = async (address: string, options?: txQueryBaseParams) => {
+    // v1
+    // const txListResponse: AxiosResponse<TransactionsByAddressResponse> = await axios({
+    //   baseURL: this.indexingBaseUrl,
+    //   url: `/address/${address.toLowerCase()}/normal`,
+    //   params: { ...options },
+    // });
+
+    // v2 native token
     const txListResponse: AxiosResponse<TransactionsByAddressResponse> = await axios({
       baseURL: this.indexingBaseUrl,
-      url: `/address/${address.toLowerCase()}/normal`,
+      url: `/address/${address.toLowerCase()}/transactions`,
       params: { ...options },
     });
 
