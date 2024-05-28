@@ -1,4 +1,4 @@
-import { bech32ToEVMAddress, isValidURL } from './utils';
+import { bech32ToEVMAddress } from './utils';
 
 describe('Testing Common utils functions', () => {
   it('Test decoding Bech32 address ', () => {

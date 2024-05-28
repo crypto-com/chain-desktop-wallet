@@ -1,6 +1,6 @@
 import { Contract, providers } from 'ethers';
 import { Filter, Log } from '@ethersproject/abstract-provider';
-import Web3 from 'web3';
+import { Web3 } from 'web3';
 import { sleep } from '../../../../utils/utils';
 import { CronosClient } from '../../../../service/cronos/CronosClient';
 import { ContractData } from '../../../../service/rpc/models/cronos.models';

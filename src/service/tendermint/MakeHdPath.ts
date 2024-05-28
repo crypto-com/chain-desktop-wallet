@@ -1,4 +1,4 @@
-import { HdPath, Slip10RawIndex } from '@cosmjs/stargate/node_modules/@cosmjs/crypto';
+import { HdPath, Slip10RawIndex } from '@cosmjs/crypto';
 import { DerivationPathStandard } from '../signers/LedgerSigner';
 
 export class MakeHdPath {

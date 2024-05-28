@@ -594,7 +594,7 @@ const HomePage = () => {
                                         verticalAlign: 'middle',
                                       }}
                                     />
-                                    {middleEllipsis(model.token_address, 6)}{' '}
+                                    {middleEllipsis(model.token_address ?? '', 6)}{' '}
                                   </>
                                 }
                               />

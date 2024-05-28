@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { bech32 } from 'bech32';
 import { ethers } from 'ethers';
 import { CroNetwork } from '@crypto-org-chain/chain-jslib';
-import Web3 from 'web3';
+import { Web3 } from 'web3';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
 import { Network, WalletConfig, SupportedChainName } from '../config/StaticConfig';
 import { CRC20MainnetTokenInfos } from '../config/CRC20Tokens';

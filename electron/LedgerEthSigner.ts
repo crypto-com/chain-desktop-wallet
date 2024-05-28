@@ -2,7 +2,7 @@
 import TransportHID from '@ledgerhq/hw-transport-node-hid';
 import Eth from '@ledgerhq/hw-app-eth';
 import { ethers } from 'ethers';
-import Web3 from 'web3';
+import { Web3 } from 'web3';
 import { TypedDataUtils } from 'eth-sig-util';
 import { DerivationPathStandard, LedgerSigner } from '../src/service/signers/LedgerSigner';
 import { UserAssetType } from '../src/models/UserAsset';
@@ -171,7 +171,7 @@ export class LedgerEthSigner {
       const path = LedgerSigner.getDerivationPath(index, UserAssetType.EVM, SupportedChainName.CRONOS, standard);
       const web3 = new Web3(url);
       const from_addr = (await this.app!.getAddress(path)).address;
-      const nonce = await web3.eth.getTransactionCount(from_addr);
+      const nonce = ethers.BigNumber.from(await web3.eth.getTransactionCount(from_addr)).toNumber();
       const signedTx = await this.doSignTx(
         path,
         chainId,
@@ -184,7 +184,7 @@ export class LedgerEthSigner {
       );
       const txHash = (await web3.eth.sendSignedTransaction(signedTx)).transactionHash;
 
-      return txHash;
+      return ethers.utils.hexlify(txHash);
     } finally {
       await this.closeTransport();
     }

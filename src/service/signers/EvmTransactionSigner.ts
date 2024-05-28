@@ -1,5 +1,5 @@
 import { BigNumberish, ethers } from 'ethers';
-import Web3 from 'web3';
+import { Web3 } from 'web3';
 import { AbiItem } from 'web3-utils';
 import { signTypedData_v4 } from 'eth-sig-util';
 import { ITransactionSigner } from './TransactionSigner';
@@ -34,7 +34,7 @@ class EvmTransactionSigner implements ITransactionSigner {
     const web3 = new Web3('');
     const transferAsset = transaction.asset;
 
-    const gasPriceBN = web3.utils.toBN(
+    const gasPriceBN = ethers.BigNumber.from(
       transferAsset?.config?.fee?.networkFee! || (transaction.gasPrice ?? '0'),
     );
 
@@ -199,7 +199,7 @@ class EvmTransactionSigner implements ITransactionSigner {
       throw new TypeError('The asset type is expected to be a CRC_20_TOKEN or ERC_20_TOKEN');
     }
 
-    const gasPriceBN = web3.utils.toBN(
+    const gasPriceBN = ethers.BigNumber.from(
       transaction.gasPrice || transferAsset?.config?.fee?.networkFee!,
     );
     const encodedTokenTransfer = this.encodeTokenTransferABI(

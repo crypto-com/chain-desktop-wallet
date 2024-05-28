@@ -1,7 +1,8 @@
 import { getBech32AddressFromEVMAddress } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { AbiItem } from 'web3-utils';
-import Web3 from 'web3';
-import { TransactionConfig } from 'web3-eth';
+import { Web3 } from 'web3';
+import { ethers } from 'ethers';
+import { Transaction } from 'web3-types';
 import { CroNetwork } from '@crypto-org-chain/chain-jslib/lib/dist/core/cro';
 import Big from 'big.js';
 import axios from 'axios';
@@ -97,7 +98,7 @@ export class BridgeService {
 
     const web3 = new Web3(originAsset.config?.nodeUrl);
 
-    const txConfig: TransactionConfig = {
+    const txConfig: Transaction = {
       from: bridgeTransferRequest.evmAddress,
       to: recipientAddress,
       value: web3.utils.toWei(bridgeTransferRequest.amount, 'ether'),
@@ -151,7 +152,7 @@ export class BridgeService {
         currentSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44;
 
       // Use fixed hard-coded max GasLimit for bridge transactions ( Known contract and predictable consumption )
-      const gasPriceTx = web3.utils.toBN(bridgeTransaction.gasPrice);
+      const gasPriceTx = ethers.BigNumber.from(bridgeTransaction.gasPrice);
 
       signedTransactionHex = await device.signEthTx(
         walletAddressIndex,
@@ -272,7 +273,7 @@ export class BridgeService {
 
     const web3 = new Web3(originAsset.config?.nodeUrl);
 
-    const txConfig: TransactionConfig = {
+    const txConfig: Transaction = {
       from: bridgeTransferRequest.evmAddress,
       to: recipientAddress,
       value: web3.utils.toWei(bridgeTransferRequest.amount, 'ether'),
@@ -325,7 +326,7 @@ export class BridgeService {
         currentSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44;
 
       // Use fixed hard-coded max GasLimit for bridge transactions ( Known contract and predictable consumption )
-      const gasPriceTx = web3.utils.toBN(bridgeTransaction.gasPrice);
+      const gasPriceTx = ethers.BigNumber.from(bridgeTransaction.gasPrice);
 
       signedTransactionHex = await device.signEthTx(
         walletAddressIndex,

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import Web3 from 'web3';
+import { Web3 } from 'web3';
 import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js';
 import { HandlerDetails } from 'electron';

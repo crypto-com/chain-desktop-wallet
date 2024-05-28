@@ -1,5 +1,5 @@
-import Web3 from 'web3';
-import { TransactionConfig } from 'web3-eth';
+import { Web3 } from 'web3';
+import { Transaction } from 'web3-types';
 import { ethers } from 'ethers';
 import Big from 'big.js';
 import {
@@ -108,7 +108,7 @@ export class TransactionSenderService {
           };
 
           const web3 = new Web3('');
-          const txConfig: TransactionConfig = {
+          const txConfig: Transaction = {
             from: currentAsset.address,
             to: transferRequest.toAddress,
             value: web3.utils.toWei(transferRequest.amount, 'ether'),
@@ -133,8 +133,8 @@ export class TransactionSenderService {
           if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
             const device = createLedgerDevice();
 
-            const gasLimitTx = web3.utils.toBN(transfer.gasLimit!);
-            const gasPriceTx = web3.utils.toBN(transfer.gasPrice);
+            const gasLimitTx = ethers.BigNumber.from(transfer.gasLimit!);
+            const gasPriceTx = ethers.BigNumber.from(transfer.gasPrice);
 
             signedTx = await device.signEthTx(
               walletAddressIndex,
@@ -207,7 +207,7 @@ export class TransactionSenderService {
           );
 
           const web3 = new Web3('');
-          const txConfig: TransactionConfig = {
+          const txConfig: Transaction = {
             from: transferAsset.address,
             to: transferAsset.contractAddress,
             value: 0,
@@ -232,8 +232,8 @@ export class TransactionSenderService {
           if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
             const device = createLedgerDevice();
 
-            const gasLimitTx = web3.utils.toBN(transfer.gasLimit!);
-            const gasPriceTx = web3.utils.toBN(transfer.gasPrice);
+            const gasLimitTx = ethers.BigNumber.from(transfer.gasLimit!);
+            const gasPriceTx = ethers.BigNumber.from(transfer.gasPrice!);
 
             signedTx = await device.signEthTx(
               walletAddressIndex,
@@ -858,7 +858,7 @@ export class TransactionSenderService {
           },
         );
 
-        const prepareTXConfig: TransactionConfig = {
+        const prepareTXConfig: Transaction = {
           from: sender,
           to: recipient,
           data: encodedABITokenTransferData,
