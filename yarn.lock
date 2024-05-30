@@ -21084,7 +21084,7 @@ web3-utils@4.3.0, web3-utils@^4.0.4, web3-utils@^4.0.7, web3-utils@^4.2.3, web3-
     web3-types "^1.6.0"
     web3-validator "^2.0.6"
 
-web3-validator@^2.0.0, web3-validator@^2.0.3, web3-validator@^2.0.5, web3-validator@^2.0.6:
+web3-validator@2.0.6, web3-validator@^2.0.0, web3-validator@^2.0.3, web3-validator@^2.0.5, web3-validator@^2.0.6:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/web3-validator/-/web3-validator-2.0.6.tgz#a0cdaa39e1d1708ece5fae155b034e29d6a19248"
   integrity sha512-qn9id0/l1bWmvH4XfnG/JtGKKwut2Vokl6YXP5Kfg424npysmtRLe9DgiNBM9Op7QL/aSiaA0TVXibuIuWcizg==

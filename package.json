@@ -353,7 +353,7 @@
   "babel": {
     "presets": [
       "react-app",
-      "@babel/preset-env"
+      ["@babel/preset-env", { "loose": true }]
     ]
   },
   "resolutions": {
