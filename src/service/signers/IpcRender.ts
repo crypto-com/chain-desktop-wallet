@@ -4,7 +4,7 @@ import { DerivationPathStandard } from './LedgerSigner';
 import { ISignerProvider } from './SignerProvider';
 
 let electron: any;
-if (window.require) {
+if (typeof window !== "undefined" && window.require) {
   electron = window.require('electron');
 }
 export class IpcRender implements ISignerProvider {

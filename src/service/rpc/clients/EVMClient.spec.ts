@@ -1,3 +1,6 @@
+/**
+ * @jest-environment node
+ */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 
 import 'mocha';

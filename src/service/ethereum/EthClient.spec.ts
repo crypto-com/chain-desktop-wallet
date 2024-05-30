@@ -1,3 +1,6 @@
+/**
+ * @jest-environment node
+ */
 /* eslint-disable */
 import 'mocha';
 import axios from 'axios';
