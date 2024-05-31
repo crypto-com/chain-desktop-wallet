@@ -1,4 +1,4 @@
-import { Web3, HttpProvider } from 'web3';
+import Web3 from 'web3';
 import { ethers } from 'ethers';
 import { Block, TransactionReceipt, Transaction } from 'web3-types';
 import { AbiItem, bytesToHex } from 'web3-utils';
@@ -18,7 +18,7 @@ class EVMClient implements IEvmRpc {
       !web3HttpProviderUrlUser.startsWith('https://') ||
       !web3HttpProviderUrlUser.startsWith('http://')
     ) {
-      const web3 = new Web3(new HttpProvider(web3HttpProviderUrlUser));
+      const web3 = new Web3(new Web3.providers.HttpProvider(web3HttpProviderUrlUser));
       return new EVMClient(web3);
     }
     throw new Error('Please provide a valid HTTP Web3 Provider.');

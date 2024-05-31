@@ -39,12 +39,12 @@ class EvmTransactionSigner implements ITransactionSigner {
     );
 
     const chainId = transaction?.asset?.config?.chainId || DEFAULT_CHAIN_ID;
-    const txParams = {
+    const txParams: ethers.providers.TransactionRequest = {
       nonce: toHex(transaction.nonce || 0),
       gasPrice: gasPriceBN.toHexString(),
       gasLimit: parseInt(transferAsset?.config?.fee?.gasLimit ?? '0') || transaction.gasLimit,
       to: transaction.toAddress,
-      value: toHex(transaction.amount),
+      value: ethers.BigNumber.from(transaction.amount),
       data:
         transaction.memo && transaction.memo.length > 0
           ? utf8ToHex(transaction.memo)
