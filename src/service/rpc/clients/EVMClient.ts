@@ -1,7 +1,8 @@
-import { Web3 } from 'web3';
+import { Web3, HttpProvider } from 'web3';
 import { ethers } from 'ethers';
 import { Block, TransactionReceipt, Transaction } from 'web3-types';
 import { AbiItem } from 'web3-utils';
+import { isHex } from 'web3-validator';
 import { IEvmRpc } from '../interface/evm.rpcClient';
 import TokenContractABI from '../../../service/signers/abi/TokenContractABI.json';
 
@@ -17,7 +18,7 @@ class EVMClient implements IEvmRpc {
       !web3HttpProviderUrlUser.startsWith('https://') ||
       !web3HttpProviderUrlUser.startsWith('http://')
     ) {
-      const web3 = new Web3(new Web3.providers.HttpProvider(web3HttpProviderUrlUser));
+      const web3 = new Web3(new HttpProvider(web3HttpProviderUrlUser));
       return new EVMClient(web3);
     }
     throw new Error('Please provide a valid HTTP Web3 Provider.');
@@ -46,7 +47,7 @@ class EVMClient implements IEvmRpc {
       throw new Error('Please provide a valid EVM compatible address.');
     }
 
-    const nativeBalance = await ethers.BigNumber.from(this.web3.eth.getBalance(address, 'latest')).toString();
+    const nativeBalance = await ethers.BigNumber.from(await this.web3.eth.getBalance(address, 'latest')).toString();
     return nativeBalance;
   }
 
@@ -133,7 +134,7 @@ class EVMClient implements IEvmRpc {
 
   // Broadcast
   async broadcastRawTransactionHex(signedTxHex: string): Promise<string> {
-    if (!this.web3.utils.isHex(signedTxHex)) {
+    if (!isHex(signedTxHex)) {
       throw new Error('Please provide a valid Hex string.');
     }
     if (!signedTxHex.startsWith('0x')) {

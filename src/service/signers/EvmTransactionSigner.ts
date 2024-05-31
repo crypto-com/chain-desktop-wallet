@@ -24,6 +24,7 @@ import { IERC20__factory } from '../../contracts';
 import { DerivationPathStandard } from './LedgerSigner';
 
 const DEFAULT_CHAIN_ID = 338;
+const DEFAULT_PROVIDER = 'http://localhost:8545';
 
 class EvmTransactionSigner implements ITransactionSigner {
   // eslint-disable-next-line class-methods-use-this
@@ -31,7 +32,7 @@ class EvmTransactionSigner implements ITransactionSigner {
     transaction: TransferTransactionUnsigned,
     phrase: string,
   ): Promise<string> {
-    const web3 = new Web3('');
+    const web3 = new Web3(DEFAULT_PROVIDER);
     const transferAsset = transaction.asset;
 
     const gasPriceBN = ethers.BigNumber.from(
@@ -41,7 +42,7 @@ class EvmTransactionSigner implements ITransactionSigner {
     const chainId = transaction?.asset?.config?.chainId || DEFAULT_CHAIN_ID;
     const txParams = {
       nonce: web3.utils.toHex(transaction.nonce || 0),
-      gasPrice: web3.utils.toHex(gasPriceBN),
+      gasPrice: gasPriceBN.toHexString(),
       gasLimit: parseInt(transferAsset?.config?.fee?.gasLimit ?? '0') || transaction.gasLimit,
       to: transaction.toAddress,
       value: web3.utils.toHex(transaction.amount),
@@ -185,7 +186,7 @@ class EvmTransactionSigner implements ITransactionSigner {
     transaction: TransferTransactionUnsigned,
     phrase: string,
   ): Promise<string> {
-    const web3 = new Web3('');
+    const web3 = new Web3(DEFAULT_PROVIDER);
     const transferAsset = transaction.asset;
 
     if (!transferAsset?.contractAddress) {
@@ -227,7 +228,7 @@ class EvmTransactionSigner implements ITransactionSigner {
     tokenContractAddress: string,
     transaction: TransferTransactionUnsigned,
   ) {
-    const web3 = new Web3('');
+    const web3 = new Web3(DEFAULT_PROVIDER);
     const contractABI = TokenContractABI.abi as AbiItem[];
     const contract = new web3.eth.Contract(contractABI, tokenContractAddress);
     return contract.methods.transfer(transaction.toAddress, transaction.amount).encodeABI();
@@ -245,7 +246,7 @@ class EvmTransactionSigner implements ITransactionSigner {
 
   // eslint-disable-next-line class-methods-use-this
   public encodeNFTTransferABI(tokenContractAddress: string, transaction: EVMNFTTransferUnsigned) {
-    const web3 = new Web3('');
+    const web3 = new Web3(DEFAULT_PROVIDER);
     const contractABI = CRC721TokenContractABI.abi as AbiItem[];
     const contract = new web3.eth.Contract(contractABI, tokenContractAddress);
     return contract.methods
@@ -275,7 +276,7 @@ class EvmTransactionSigner implements ITransactionSigner {
     transaction: BridgeTransactionUnsigned,
     phrase: string,
   ): Promise<string> {
-    const web3 = new Web3('');
+    const web3 = new Web3(DEFAULT_PROVIDER);
 
     const transferAsset = transaction.originAsset;
     const chainId = transaction?.asset?.config?.chainId || 338;
