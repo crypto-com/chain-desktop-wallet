@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { bech32 } from 'bech32';
 import { ethers } from 'ethers';
 import { CroNetwork } from '@crypto-org-chain/chain-jslib';
-import { Web3 } from 'web3';
+import { toChecksumAddress, toHex } from 'web3-utils';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
 import { Network, WalletConfig, SupportedChainName } from '../config/StaticConfig';
 import { CRC20MainnetTokenInfos } from '../config/CRC20Tokens';
@@ -293,7 +293,7 @@ export function getAllERC20WhiteListedAddress() {
 }
 
 export function isAddressEqual(lhs: string, rhs: string) {
-  return Web3.utils.toChecksumAddress(lhs) === Web3.utils.toChecksumAddress(rhs);
+  return toChecksumAddress(lhs) === toChecksumAddress(rhs);
 }
 
 export function isLocalhostURL(str: string) {
@@ -337,5 +337,5 @@ export function addHTTPsPrefixIfNeeded(str: string) {
 }
 
 export function isHexEqual(lhs: string, rhs: string) {
-  return Web3.utils.toHex(lhs) === Web3.utils.toHex(rhs);
+  return toHex(lhs) === toHex(rhs);
 }

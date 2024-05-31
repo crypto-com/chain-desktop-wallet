@@ -1,8 +1,8 @@
 import { Web3, HttpProvider } from 'web3';
 import { ethers } from 'ethers';
 import { Block, TransactionReceipt, Transaction } from 'web3-types';
-import { AbiItem } from 'web3-utils';
-import { isHex } from 'web3-validator';
+import { AbiItem, bytesToHex } from 'web3-utils';
+import { isHex, isAddress } from 'web3-validator';
 import { IEvmRpc } from '../interface/evm.rpcClient';
 import TokenContractABI from '../../../service/signers/abi/TokenContractABI.json';
 
@@ -43,7 +43,7 @@ class EVMClient implements IEvmRpc {
 
   // Address
   async getNativeBalanceByAddress(address: string): Promise<string> {
-    if (!this.web3.utils.isAddress(address)) {
+    if (!isAddress(address)) {
       throw new Error('Please provide a valid EVM compatible address.');
     }
 
@@ -52,7 +52,7 @@ class EVMClient implements IEvmRpc {
   }
 
   async getBalanceOfContractByAddress(tokenContractAddress: string, address: string): Promise<string> {
-    if (!this.web3.utils.isAddress(address) || !this.web3.utils.isAddress(tokenContractAddress)) {
+    if (!isAddress(address) || !isAddress(tokenContractAddress)) {
       throw new Error('Please provide a valid EVM compatible address.');
     }
 
@@ -68,7 +68,7 @@ class EVMClient implements IEvmRpc {
     decimals: string;
     symbol: string;
   }> {
-    if (!this.web3.utils.isAddress(tokenContractAddress)) {
+    if (!isAddress(tokenContractAddress)) {
       throw new Error('Please provide a valid EVM compatible address.');
     }
 
@@ -86,7 +86,7 @@ class EVMClient implements IEvmRpc {
   }
 
   async getNextNonceByAddress(address: string): Promise<number> {
-    if (!this.web3.utils.isAddress(address)) {
+    if (!isAddress(address)) {
       throw new Error('Please provide a valid EVM compatible address.');
     }
     const pendingNonce = await this.web3.eth.getTransactionCount(address, 'pending');
@@ -153,7 +153,7 @@ class EVMClient implements IEvmRpc {
       });
 
       if (broadcastTx.status) {
-        return this.web3.utils.bytesToHex(broadcastTx.transactionHash);
+        return bytesToHex(broadcastTx.transactionHash);
       }
     } catch (e) {
       if (broadcastTxHash) {

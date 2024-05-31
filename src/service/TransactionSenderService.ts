@@ -1,4 +1,4 @@
-import { Web3 } from 'web3';
+import { toHex, toWei } from 'web3-utils';
 import { Transaction } from 'web3-types';
 import { ethers } from 'ethers';
 import Big from 'big.js';
@@ -107,11 +107,10 @@ export class TransactionSenderService {
             asset: currentAsset,
           };
 
-          const web3 = new Web3('');
           const txConfig: Transaction = {
             from: currentAsset.address,
             to: transferRequest.toAddress,
-            value: web3.utils.toWei(transferRequest.amount, 'ether'),
+            value: toWei(transferRequest.amount, 'ether'),
           };
 
           const prepareTxInfo = await this.transactionPrepareService.prepareEVMTransaction(
@@ -141,10 +140,10 @@ export class TransactionSenderService {
               walletDerivationPathStandard,
               Number(transfer.asset?.config?.chainId), // chainid
               transfer.nonce,
-              web3.utils.toHex(gasLimitTx) /* gas limit */,
-              web3.utils.toHex(gasPriceTx) /* gas price */,
+              toHex(gasLimitTx) /* gas limit */,
+              toHex(gasPriceTx) /* gas price */,
               transfer.toAddress,
-              web3.utils.toHex(transfer.amount),
+              toHex(transfer.amount),
               `0x${Buffer.from(transfer.memo).toString('hex')}`,
             );
           } else {
@@ -206,7 +205,6 @@ export class TransactionSenderService {
             transfer,
           );
 
-          const web3 = new Web3('');
           const txConfig: Transaction = {
             from: transferAsset.address,
             to: transferAsset.contractAddress,
@@ -240,8 +238,8 @@ export class TransactionSenderService {
               walletDerivationPathStandard,
               Number(transfer.asset?.config?.chainId), // chainid
               transfer.nonce,
-              web3.utils.toHex(gasLimitTx) /* gas limit */,
-              web3.utils.toHex(gasPriceTx) /* gas price */,
+              toHex(gasLimitTx) /* gas limit */,
+              toHex(gasPriceTx) /* gas price */,
               transferAsset.contractAddress,
               '0x0',
               encodedABITokenTransfer,

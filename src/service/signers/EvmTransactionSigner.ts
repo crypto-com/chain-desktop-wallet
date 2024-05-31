@@ -1,6 +1,6 @@
 import { BigNumberish, ethers } from 'ethers';
 import { Web3 } from 'web3';
-import { AbiItem } from 'web3-utils';
+import { AbiItem, toHex, utf8ToHex } from 'web3-utils';
 import { signTypedData_v4 } from 'eth-sig-util';
 import { ITransactionSigner } from './TransactionSigner';
 import TokenContractABI from './abi/TokenContractABI.json';
@@ -32,7 +32,6 @@ class EvmTransactionSigner implements ITransactionSigner {
     transaction: TransferTransactionUnsigned,
     phrase: string,
   ): Promise<string> {
-    const web3 = new Web3(DEFAULT_PROVIDER);
     const transferAsset = transaction.asset;
 
     const gasPriceBN = ethers.BigNumber.from(
@@ -41,14 +40,14 @@ class EvmTransactionSigner implements ITransactionSigner {
 
     const chainId = transaction?.asset?.config?.chainId || DEFAULT_CHAIN_ID;
     const txParams = {
-      nonce: web3.utils.toHex(transaction.nonce || 0),
+      nonce: toHex(transaction.nonce || 0),
       gasPrice: gasPriceBN.toHexString(),
       gasLimit: parseInt(transferAsset?.config?.fee?.gasLimit ?? '0') || transaction.gasLimit,
       to: transaction.toAddress,
-      value: web3.utils.toHex(transaction.amount),
+      value: toHex(transaction.amount),
       data:
         transaction.memo && transaction.memo.length > 0
-          ? web3.utils.utf8ToHex(transaction.memo)
+          ? utf8ToHex(transaction.memo)
           : '0x',
       chainId: Number(chainId),
     };
@@ -186,7 +185,6 @@ class EvmTransactionSigner implements ITransactionSigner {
     transaction: TransferTransactionUnsigned,
     phrase: string,
   ): Promise<string> {
-    const web3 = new Web3(DEFAULT_PROVIDER);
     const transferAsset = transaction.asset;
 
     if (!transferAsset?.contractAddress) {
@@ -210,8 +208,8 @@ class EvmTransactionSigner implements ITransactionSigner {
 
     const chainId = transaction?.asset?.config?.chainId || DEFAULT_CHAIN_ID;
     const txParams = {
-      nonce: web3.utils.toHex(transaction.nonce || 0),
-      gasPrice: web3.utils.toHex(gasPriceBN),
+      nonce: toHex(transaction.nonce || 0),
+      gasPrice: toHex(gasPriceBN),
       gasLimit: transaction.gasLimit || transferAsset?.config?.fee?.gasLimit,
       to: transferAsset.contractAddress,
       value: 0,
@@ -276,17 +274,15 @@ class EvmTransactionSigner implements ITransactionSigner {
     transaction: BridgeTransactionUnsigned,
     phrase: string,
   ): Promise<string> {
-    const web3 = new Web3(DEFAULT_PROVIDER);
-
     const transferAsset = transaction.originAsset;
     const chainId = transaction?.asset?.config?.chainId || 338;
 
     const txParams = {
-      nonce: web3.utils.toHex(transaction.nonce || 0),
-      gasPrice: web3.utils.toHex(transaction.gasPrice || transferAsset?.config?.fee?.networkFee!),
+      nonce: toHex(transaction.nonce || 0),
+      gasPrice: toHex(transaction.gasPrice || transferAsset?.config?.fee?.networkFee!),
       gasLimit: transaction.gasLimit,
       to: transaction.toAddress,
-      value: web3.utils.toHex(transaction.amount),
+      value: toHex(transaction.amount),
       data: transaction.data,
       chainId: Number(chainId),
     };

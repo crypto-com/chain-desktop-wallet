@@ -1,6 +1,7 @@
 import { getBech32AddressFromEVMAddress } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { AbiItem } from 'web3-utils';
 import { Web3 } from 'web3';
+import { toHex, toWei } from 'web3-utils';
 import { ethers } from 'ethers';
 import { Transaction } from 'web3-types';
 import { CroNetwork } from '@crypto-org-chain/chain-jslib/lib/dist/core/cro';
@@ -101,7 +102,7 @@ export class BridgeService {
     const txConfig: Transaction = {
       from: bridgeTransferRequest.evmAddress,
       to: recipientAddress,
-      value: web3.utils.toWei(bridgeTransferRequest.amount, 'ether'),
+      value: toWei(bridgeTransferRequest.amount, 'ether'),
     };
 
     const prepareTxInfo = await this.transactionPrepareService.prepareEVMTransaction(
@@ -159,10 +160,10 @@ export class BridgeService {
         walletDerivationPathStandard,
         chainId, // chainid
         bridgeTransaction.nonce,
-        web3.utils.toHex(gasLimit) /* gas limit */,
-        web3.utils.toHex(gasPriceTx) /* gas price */,
+        toHex(gasLimit) /* gas limit */,
+        toHex(gasPriceTx) /* gas price */,
         bridgeContractAddress,
-        web3.utils.toHex(bridgeTransaction.amount),
+        toHex(bridgeTransaction.amount),
         encodedABI,
       );
     } else {
@@ -276,7 +277,7 @@ export class BridgeService {
     const txConfig: Transaction = {
       from: bridgeTransferRequest.evmAddress,
       to: recipientAddress,
-      value: web3.utils.toWei(bridgeTransferRequest.amount, 'ether'),
+      value: toWei(bridgeTransferRequest.amount, 'ether'),
     };
 
     const prepareTxInfo = await this.transactionPrepareService.prepareEVMTransaction(
@@ -333,10 +334,10 @@ export class BridgeService {
         walletDerivationPathStandard,
         chainId, // chainid
         bridgeTransaction.nonce,
-        web3.utils.toHex(gasLimit) /* gas limit */,
-        web3.utils.toHex(gasPriceTx) /* gas price */,
+        toHex(gasLimit) /* gas limit */,
+        toHex(gasPriceTx) /* gas price */,
         bridgeContractAddress,
-        web3.utils.toHex(bridgeTransaction.amount),
+        toHex(bridgeTransaction.amount),
         encodedABI,
       );
     } else {
