@@ -6,7 +6,7 @@
 import 'mocha';
 import chai, { expect } from 'chai';
 import nock from 'nock';
-import { TransactionConfig } from 'web3-eth';
+import { Transaction } from 'web3-types';
 import { IEvmRpc } from '../interface/evm.rpcClient';
 import { EVMClient } from './EVMClient';
 
@@ -71,7 +71,7 @@ describe('Testing EVMClient', () => {
       await evmRpcClient.getNextNonceByAddress('invalidaddr');
     } catch (error) {
       expect(error).to.not.be.undefined;
-      expect(error.message).to.eq('Please provide a valid EVM compatible address.');
+      expect((error as any).message).to.eq('Please provide a valid EVM compatible address.');
     }
   });
 
@@ -257,7 +257,7 @@ describe('Testing EVMClient', () => {
       jsonrpc: '2.0',
       result: '0x1234f',
     });
-    const txConfig: TransactionConfig = {
+    const txConfig: Transaction = {
       from: '0x11f4d0A3c12e86B4b5F39B213F7E19D048276DAe',
       to: '0x11f4d0A3c12e86B4b5F39B213F7E19D048276DAe',
       value: '0x12341234',
