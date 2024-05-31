@@ -171,7 +171,13 @@ describe('Testing EVMClient', () => {
       },
     });
 
-    const evmRpcClient: IEvmRpc = EVMClient.create(TestNetRPCURL);
+    nockScope.twice().reply(200, {
+      id: 0,
+      jsonrpc: '2.0',
+      result: '0x9fc76417374aa880d4449a1f7f31ec597f00b1f6f3dd2d66f4c9c6c445836d8b',
+    });
+    
+    const evmRpcClient = EVMClient.create(TestNetRPCURL);
     const broadcastedTxHash = await evmRpcClient.broadcastRawTransactionHex(
       '0xf889808609184e72a00082271094000000000000000000000000000000000000000080a47f74657374320000000000000000000000000000000000000000000000000000006000571ca08a8bbf888cfa37bbf0bb965423625641fc956967b81d12e23709cead01446075a01ce999b56a8a88504be365442ea61239198e23d1fce7d00fcfc5cd3b44b7215f',
     );
