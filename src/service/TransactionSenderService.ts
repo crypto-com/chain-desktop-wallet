@@ -1,4 +1,4 @@
-import { toHex, toWei } from 'web3-utils';
+import { toWei } from 'web3-utils';
 import { Transaction } from 'web3-types';
 import { ethers } from 'ethers';
 import Big from 'big.js';
@@ -132,18 +132,17 @@ export class TransactionSenderService {
           if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
             const device = createLedgerDevice();
 
-            const gasLimitTx = ethers.BigNumber.from(transfer.gasLimit!);
-            const gasPriceTx = ethers.BigNumber.from(transfer.gasPrice);
-
+            const gasLimitTx = ethers.BigNumber.from(transfer.gasLimit!).toHexString();
+            const gasPriceTx = ethers.BigNumber.from(transfer.gasPrice).toHexString();
             signedTx = await device.signEthTx(
               walletAddressIndex,
               walletDerivationPathStandard,
               Number(transfer.asset?.config?.chainId), // chainid
               transfer.nonce,
-              toHex(gasLimitTx) /* gas limit */,
-              toHex(gasPriceTx) /* gas price */,
+              gasLimitTx /* gas limit */,
+              gasPriceTx /* gas price */,
               transfer.toAddress,
-              toHex(transfer.amount),
+              ethers.BigNumber.from(transfer.amount).toHexString(),
               `0x${Buffer.from(transfer.memo).toString('hex')}`,
             );
           } else {
@@ -220,8 +219,8 @@ export class TransactionSenderService {
           const staticTokenTransferGasLimit = 130_000;
 
           transfer.nonce = prepareTxInfo.nonce;
-          transfer.gasPrice = prepareTxInfo.loadedGasPrice;
-          transfer.gasLimit = staticTokenTransferGasLimit;
+          transfer.gasPrice = Math.max(ethers.BigNumber.from(prepareTxInfo.loadedGasPrice).toNumber(), ethers.BigNumber.from(transferRequest.asset.config?.fee.networkFee!).toNumber()).toString();
+          transfer.gasLimit = Math.max(staticTokenTransferGasLimit, ethers.BigNumber.from(transferRequest.asset.config?.fee.gasLimit!).toNumber());
 
           // eslint-disable-next-line no-console
           console.log('TX_DATA', { gasLimit: transfer.gasLimit });
@@ -230,16 +229,16 @@ export class TransactionSenderService {
           if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
             const device = createLedgerDevice();
 
-            const gasLimitTx = ethers.BigNumber.from(transfer.gasLimit!);
-            const gasPriceTx = ethers.BigNumber.from(transfer.gasPrice!);
+            const gasLimitTx = ethers.BigNumber.from(transfer.gasLimit!).toHexString();
+            const gasPriceTx = ethers.BigNumber.from(transfer.gasPrice!).toHexString();
 
             signedTx = await device.signEthTx(
               walletAddressIndex,
               walletDerivationPathStandard,
               Number(transfer.asset?.config?.chainId), // chainid
               transfer.nonce,
-              toHex(gasLimitTx) /* gas limit */,
-              toHex(gasPriceTx) /* gas price */,
+              gasLimitTx /* gas limit */,
+              gasPriceTx /* gas price */,
               transferAsset.contractAddress,
               '0x0',
               encodedABITokenTransfer,

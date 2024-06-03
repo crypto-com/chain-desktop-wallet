@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { bech32 } from 'bech32';
 import { ethers } from 'ethers';
 import { CroNetwork } from '@crypto-org-chain/chain-jslib';
-import { toChecksumAddress, toHex } from 'web3-utils';
+import { toChecksumAddress } from 'web3-utils';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
 import { Network, WalletConfig, SupportedChainName } from '../config/StaticConfig';
 import { CRC20MainnetTokenInfos } from '../config/CRC20Tokens';
@@ -337,5 +337,5 @@ export function addHTTPsPrefixIfNeeded(str: string) {
 }
 
 export function isHexEqual(lhs: string, rhs: string) {
-  return toHex(lhs) === toHex(rhs);
+  return ethers.BigNumber.from(lhs).toHexString() === ethers.BigNumber.from(rhs).toHexString();
 }

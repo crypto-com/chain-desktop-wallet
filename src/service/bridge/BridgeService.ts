@@ -153,17 +153,19 @@ export class BridgeService {
         currentSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44;
 
       // Use fixed hard-coded max GasLimit for bridge transactions ( Known contract and predictable consumption )
-      const gasPriceTx = ethers.BigNumber.from(bridgeTransaction.gasPrice);
+      const gasPriceTx = ethers.BigNumber.from(bridgeTransaction.gasPrice).toHexString();
+      const gasLimitTx = ethers.BigNumber.from(gasLimit).toHexString();
+      const acountTx = ethers.BigNumber.from(bridgeTransaction.amount).toHexString();
 
       signedTransactionHex = await device.signEthTx(
         walletAddressIndex,
         walletDerivationPathStandard,
         chainId, // chainid
         bridgeTransaction.nonce,
-        toHex(gasLimit) /* gas limit */,
-        toHex(gasPriceTx) /* gas price */,
+        gasLimitTx /* gas limit */,
+        gasPriceTx /* gas price */,
         bridgeContractAddress,
-        toHex(bridgeTransaction.amount),
+        acountTx,
         encodedABI,
       );
     } else {
@@ -327,17 +329,19 @@ export class BridgeService {
         currentSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44;
 
       // Use fixed hard-coded max GasLimit for bridge transactions ( Known contract and predictable consumption )
-      const gasPriceTx = ethers.BigNumber.from(bridgeTransaction.gasPrice);
+      const gasPriceTx = ethers.BigNumber.from(bridgeTransaction.gasPrice).toHexString();
+      const gasLimitTx = ethers.BigNumber.from(gasLimit).toHexString();
+      const acountTx = ethers.BigNumber.from(bridgeTransaction.amount).toHexString();
 
       signedTransactionHex = await device.signEthTx(
         walletAddressIndex,
         walletDerivationPathStandard,
         chainId, // chainid
         bridgeTransaction.nonce,
-        toHex(gasLimit) /* gas limit */,
-        toHex(gasPriceTx) /* gas price */,
+        gasLimitTx /* gas limit */,
+        gasPriceTx /* gas price */,
         bridgeContractAddress,
-        toHex(bridgeTransaction.amount),
+        acountTx,
         encodedABI,
       );
     } else {
