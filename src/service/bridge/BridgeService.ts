@@ -1,7 +1,7 @@
 import { getBech32AddressFromEVMAddress } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { AbiItem } from 'web3-utils';
-import { Web3 } from 'web3';
-import { toHex, toWei } from 'web3-utils';
+import Web3 from 'web3';
+import { toWei } from 'web3-utils';
 import { ethers } from 'ethers';
 import { Transaction } from 'web3-types';
 import { CroNetwork } from '@crypto-org-chain/chain-jslib/lib/dist/core/cro';
@@ -97,7 +97,7 @@ export class BridgeService {
       originAsset.config?.indexingUrl,
     );
 
-    const web3 = new Web3(originAsset.config?.nodeUrl);
+    const web3 = new Web3(new Web3.providers.HttpProvider(originAsset.config?.nodeUrl));
 
     const txConfig: Transaction = {
       from: bridgeTransferRequest.evmAddress,
@@ -272,7 +272,7 @@ export class BridgeService {
       originAsset.config?.indexingUrl,
     );
 
-    const web3 = new Web3(originAsset.config?.nodeUrl);
+    const web3 = new Web3(new Web3.providers.HttpProvider(originAsset.config?.nodeUrl));
 
     const txConfig: Transaction = {
       from: bridgeTransferRequest.evmAddress,
