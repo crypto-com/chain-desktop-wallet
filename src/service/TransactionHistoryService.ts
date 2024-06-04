@@ -136,7 +136,7 @@ export class TransactionHistoryService {
           return {
             ...validator,
             apy: matchValidator?.apy,
-            uptime: totalRecentSignedBlocks / (totalRecentActiveBlocks > 0 ? totalRecentActiveBlocks : 100), // avoid div by zero
+            uptime: (totalRecentSignedBlocks / (totalRecentActiveBlocks > 0 ? totalRecentActiveBlocks : 100)).toString(), // avoid div by zero
           };
         })
         // Group validators by recent uptime >= 98% & uptime < 98%

@@ -1,5 +1,5 @@
 import { Promise } from 'bluebird';
-import Web3 from 'web3';
+import { asciiToHex, hexToBytes } from 'web3-utils';
 import { ellipsis, isJson } from './utils';
 import {
   CommonNftModel,
@@ -168,8 +168,8 @@ export class NftUtils {
   };
 
   public static generateLinearGradientByAddress = (address: string) => {
-    const hexAddress = Web3.utils.asciiToHex(address);
-    const byteAddress = Web3.utils.hexToBytes(hexAddress).map(b => b * 2);
+    const hexAddress = asciiToHex(address);
+    const byteAddress = hexToBytes(hexAddress).map(b => b * 2);
 
     const gradient = `linear-gradient(${byteAddress[0]}deg,
       rgba(${byteAddress[1]}, ${byteAddress[2]}, ${byteAddress[3]}, 1),  

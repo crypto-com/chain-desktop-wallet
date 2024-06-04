@@ -39,7 +39,7 @@ export class IpcMain {
       } catch (e) {
         ret = {
           success: false,
-          error: e.toString(),
+          error: (e as any).toString(),
         };
         console.error('enableWallet error ' + e);
       } finally {
@@ -65,7 +65,7 @@ export class IpcMain {
       } catch (e) {
         ret = {
           success: false,
-          error: e.toString(),
+          error: (e as any).toString(),
         };
         console.error('getAddressList error ' + e);
       } finally {
@@ -89,7 +89,7 @@ export class IpcMain {
       } catch (e) {
         ret = {
           success: false,
-          error: e.toString(),
+          error: (e as any).toString(),
         };
         console.error('signMessage error ' + e);
       }
@@ -117,7 +117,7 @@ export class IpcMain {
       } catch (e) {
         ret = {
           success: false,
-          error: e.toString(),
+          error: (e as any).toString(),
         };
         console.error('ethSignSendTx error ' + e);
       }
@@ -147,7 +147,7 @@ export class IpcMain {
       } catch (e) {
         ret = {
           success: false,
-          error: e.toString(),
+          error: (e as any).toString(),
         };
         console.error('ethSignTx error ' + e);
       }
@@ -165,7 +165,7 @@ export class IpcMain {
       } catch (e) {
         ret = {
           success: false,
-          error: e.toString(),
+          error: (e as any).toString(),
         };
         console.error('ethGetAddress error ' + e);
       }
@@ -183,7 +183,7 @@ export class IpcMain {
       } catch (e) {
         ret = {
           success: false,
-          error: e.toString(),
+          error: (e as any).toString(),
         };
         console.error('ethGetAddressList error ' + e);
       }
@@ -203,7 +203,7 @@ export class IpcMain {
       } catch (e) {
         ret = {
           success: false,
-          error: e.toString(),
+          error: (e as any).toString(),
         };
         console.error('ethSignPersonalMessage error ', e);
       }
@@ -222,7 +222,7 @@ export class IpcMain {
       } catch (e) {
         ret = {
           success: false,
-          error: e.toString(),
+          error: (e as any).toString(),
         };
         console.error('ethSignTypedDataV4 error ' + e);
       }

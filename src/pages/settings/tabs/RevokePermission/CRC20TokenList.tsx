@@ -6,7 +6,7 @@ import { getAddress } from 'ethers/lib/utils';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRecoilValue } from 'recoil';
-import { TransactionConfig } from 'web3-core';
+import { Transaction } from 'web3-types';
 import { usePasswordModal } from '../../../../components/PasswordForm/PasswordFormModal';
 import { UserAsset } from '../../../../models/UserAsset';
 import { allMarketState, sessionState } from '../../../../recoil/atom';
@@ -298,7 +298,7 @@ const CRC20TokenList = ({
             }
 
             try {
-              const prepareTXConfig: TransactionConfig = {
+              const prepareTXConfig: Transaction = {
                 from: event.object.from,
                 to: event.object.to,
               };

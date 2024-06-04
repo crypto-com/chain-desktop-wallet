@@ -1,4 +1,4 @@
-import { TransactionConfig } from 'web3-eth';
+import { Transaction } from 'web3-types';
 import { NodeRpcService } from './rpc/NodeRpcService';
 import { TransactionSigner } from './signers/TransactionSigner';
 import { CosmjsTendermintTransactionSigner } from './signers/CosmjsTendermintTransactionSigner';
@@ -72,7 +72,7 @@ export class TransactionPrepareService {
   // eslint-disable-next-line class-methods-use-this
   public async prepareEVMTransaction(
     originAsset: UserAsset,
-    txConfig: TransactionConfig,
+    txConfig: Transaction,
   ): Promise<PrepareEVMTransaction> {
     const currentSession = await this.storageService.retrieveCurrentSession();
 

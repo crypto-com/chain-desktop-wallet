@@ -1,9 +1,12 @@
+/**
+ * @jest-environment node
+ */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 
 import 'mocha';
 import chai, { expect } from 'chai';
 import nock from 'nock';
-import { TransactionConfig } from 'web3-eth';
+import { Transaction } from 'web3-types';
 import { IEvmRpc } from '../interface/evm.rpcClient';
 import { EVMClient } from './EVMClient';
 
@@ -68,7 +71,7 @@ describe('Testing EVMClient', () => {
       await evmRpcClient.getNextNonceByAddress('invalidaddr');
     } catch (error) {
       expect(error).to.not.be.undefined;
-      expect(error.message).to.eq('Please provide a valid EVM compatible address.');
+      expect((error as any).message).to.eq('Please provide a valid EVM compatible address.');
     }
   });
 
@@ -79,9 +82,9 @@ describe('Testing EVMClient', () => {
       result: '0x0234c8a3397aab58',
     });
     const evmRpcClient: IEvmRpc = EVMClient.create(TestNetRPCURL);
-    const nativeBalance = await evmRpcClient.getNativeBalanceByAddress(
+    const nativeBalance = await (await evmRpcClient.getNativeBalanceByAddress(
       '0x0000000000000000000000000000000000000007',
-    );
+    )).toString();
     expect(nativeBalance).to.eq('158972490234375000');
 
     // NOTE: I tried the conventional way of checking throw but no good.
@@ -89,7 +92,7 @@ describe('Testing EVMClient', () => {
       await evmRpcClient.getNativeBalanceByAddress('invalidaddr');
     } catch (error) {
       expect(error).to.not.be.undefined;
-      expect(error.message).to.eq('Please provide a valid EVM compatible address.');
+      expect((error as Error).message).to.eq('Please provide a valid EVM compatible address.');
     }
   });
 
@@ -121,17 +124,17 @@ describe('Testing EVMClient', () => {
       },
     });
     const evmRpcClient: IEvmRpc = EVMClient.create(TestNetRPCURL);
-    const txReceipt = await evmRpcClient.getTransactionReceiptByHash('hash');
+    const txReceipt = await evmRpcClient.getTransactionReceiptByHash('0x9fc76417374aa880d4449a1f7f31ec597f00b1f6f3dd2d66f4c9c6c445836d8b');
     expect(txReceipt).to.deep.eq({
       blockHash: '0xef95f2f1ed3ca60b048b4bf67cde2195961e0bba6f70bcbea9a2c4e133e34b46',
-      blockNumber: 3,
+      blockNumber: BigInt('3'),
       contractAddress: '0x11f4d0A3c12e86B4b5F39B213F7E19D048276DAe',
-      cumulativeGasUsed: 314159,
-      gasUsed: 30234,
+      cumulativeGasUsed: BigInt('314159'),
+      gasUsed: BigInt('30234'),
       logs: [],
-      status: false,
+      status: true,
       transactionHash: '0x9fc76417374aa880d4449a1f7f31ec597f00b1f6f3dd2d66f4c9c6c445836d8b',
-      transactionIndex: 0,
+      transactionIndex: BigInt('0'),
     });
   });
   it('checks `getLatestBlockHeight` ', async () => {
@@ -168,7 +171,13 @@ describe('Testing EVMClient', () => {
       },
     });
 
-    const evmRpcClient: IEvmRpc = EVMClient.create(TestNetRPCURL);
+    nockScope.twice().reply(200, {
+      id: 0,
+      jsonrpc: '2.0',
+      result: '0x9fc76417374aa880d4449a1f7f31ec597f00b1f6f3dd2d66f4c9c6c445836d8b',
+    });
+    
+    const evmRpcClient = EVMClient.create(TestNetRPCURL);
     const broadcastedTxHash = await evmRpcClient.broadcastRawTransactionHex(
       '0xf889808609184e72a00082271094000000000000000000000000000000000000000080a47f74657374320000000000000000000000000000000000000000000000000000006000571ca08a8bbf888cfa37bbf0bb965423625641fc956967b81d12e23709cead01446075a01ce999b56a8a88504be365442ea61239198e23d1fce7d00fcfc5cd3b44b7215f',
     );
@@ -214,21 +223,21 @@ describe('Testing EVMClient', () => {
     const block = await evmRpcClient.getBlock(3);
 
     const blockResult = {
-      difficulty: '21345678965432',
+      difficulty: BigInt('21345678965432'),
       extraData: '0x',
-      gasLimit: 3141592,
-      gasUsed: 21662,
+      gasLimit: BigInt('3141592'),
+      gasUsed: BigInt('21662'),
       hash: '0xef95f2f1ed3ca60b048b4bf67cde2195961e0bba6f70bcbea9a2c4e133e34b46',
       logsBloom: '',
-      miner: '0x8888f1F195AFa192CfeE860698584c030f4c9dB1',
-      nonce: '0xfb6e1a62d119228b',
-      number: 3,
+      miner: '0x8888f1f195afa192cfee860698584c030f4c9db1',
+      nonce: BigInt('0xfb6e1a62d119228b'),
+      number: BigInt('3'),
       parentHash: '0x2302e1c0b972d00932deb5dab9eb2982f570597d9d42504c05d9c2147eaf9c88',
       sha3Uncles: '0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347',
-      size: 616,
+      size: BigInt('616'),
       stateRoot: '0xf1133199d44695dfa8fd1bcfe424d82854b5cebef75bddd7e40ea94cda515bcb',
-      timestamp: 1429287689,
-      totalDifficulty: '324567845321',
+      timestamp: BigInt('1429287689'),
+      totalDifficulty: BigInt('324567845321'),
       transactions: ['0x9fc76417374aa880d4449a1f7f31ec597f00b1f6f3dd2d66f4c9c6c445836d8b'],
       transactionsRoot: '0x3a1b03875115b79539e5bd33fb00d8f7b7cd61929d5a3c574f507b8acf415bee',
       uncles: [],
@@ -254,7 +263,7 @@ describe('Testing EVMClient', () => {
       jsonrpc: '2.0',
       result: '0x1234f',
     });
-    const txConfig: TransactionConfig = {
+    const txConfig: Transaction = {
       from: '0x11f4d0A3c12e86B4b5F39B213F7E19D048276DAe',
       to: '0x11f4d0A3c12e86B4b5F39B213F7E19D048276DAe',
       value: '0x12341234',

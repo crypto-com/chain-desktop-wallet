@@ -10,7 +10,7 @@ import {
   TxBodyEncodeObject,
 } from '@cosmjs/proto-signing';
 import { MsgSendEncodeObject, MsgTransferEncodeObject } from '@cosmjs/stargate';
-import { HdPath } from '@cosmjs/stargate/node_modules/@cosmjs/crypto';
+import { HdPath } from '@cosmjs/crypto';
 import {
   toBase64,
   fromBase64,

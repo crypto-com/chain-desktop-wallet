@@ -15,7 +15,7 @@
     "noEmitOnError": true,
     "esModuleInterop": true ,
     "typeRoots": ["node_modules/@types"],
-    "types":["long"],
+    // "types":["long"],
     "experimentalDecorators": true  
   }
 }

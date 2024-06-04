@@ -169,9 +169,9 @@ export class LedgerEthSigner {
     try {
       await this.createTransport();
       const path = LedgerSigner.getDerivationPath(index, UserAssetType.EVM, SupportedChainName.CRONOS, standard);
-      const web3 = new Web3(url);
+      const web3 = new Web3(new Web3.providers.HttpProvider(url));
       const from_addr = (await this.app!.getAddress(path)).address;
-      const nonce = await web3.eth.getTransactionCount(from_addr);
+      const nonce = ethers.BigNumber.from(await web3.eth.getTransactionCount(from_addr)).toNumber();
       const signedTx = await this.doSignTx(
         path,
         chainId,
@@ -184,7 +184,7 @@ export class LedgerEthSigner {
       );
       const txHash = (await web3.eth.sendSignedTransaction(signedTx)).transactionHash;
 
-      return txHash;
+      return ethers.utils.hexlify(txHash);
     } finally {
       await this.closeTransport();
     }
