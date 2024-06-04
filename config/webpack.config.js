@@ -402,6 +402,7 @@ module.exports = function(webpackEnv) {
                       },
                     },
                   ],
+                  [require.resolve('@babel/plugin-proposal-nullish-coalescing-operator')],
                   isEnvDevelopment &&
                     shouldUseReactRefresh &&
                     require.resolve('react-refresh/babel'),
@@ -427,6 +428,9 @@ module.exports = function(webpackEnv) {
                 compact: false,
                 presets: [
                   [require.resolve('babel-preset-react-app/dependencies'), { helpers: true }],
+                ],
+                plugins: [
+                  [require.resolve('@babel/plugin-proposal-nullish-coalescing-operator')],
                 ],
                 cacheDirectory: true,
                 // See #6846 for context on why cacheCompression is disabled
