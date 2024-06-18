@@ -1,9 +1,9 @@
 # Crypto.com DeFi Desktop Wallet
 
 ## Warning
-Crypto.com DeFi Desktop Wallet may subject to changes. Before proceeding, please be aware of the following:
+Crypto.com DeFi Desktop Wallet may be subject to change. Before proceeding, please be aware of the following:
 
-- Crypto.com is not liable for any potential damage, loss of data/files arising from the use of the wallet.
+- Crypto.com is not liable for any potential damage, loss of data, or files arising from the use of the wallet.
 
 ## Latest releases
 
@@ -22,9 +22,9 @@ Please refer to the [Instructions on Multi-Language Content Management](./CONTEN
 
 ### Pre-requirements
 
-This project requires [Node.js](https://nodejs.org/) to build, [.node-version](./.node-version) indicates the version currently using. 
+This project requires [Node.js](https://nodejs.org/) to build, [.node-version](./.node-version) indicates the version currently being used. 
 
-You can either install Node.js globally or use any of the Node Version Manager which respect [.node-version](./.node-version) in [this list](https://github.com/shadowspawn/node-version-usage).
+You can either install Node.js globally or use any of the Node Version Manager versions, with respect to [.node-version](./.node-version) in [this list](https://github.com/shadowspawn/node-version-usage).
 
 ### Installation
 
@@ -47,7 +47,7 @@ yarn build
 ```
 Builds an optimized web distributable output for the repository.
 
-The final output build should be ready to be deployed like any normal react web app. The /build folder is ready to be deployed 🚀
+The final output build should be ready to be deployed like any normal react web app. The `/build` folder is ready to be deployed 🚀
 
 
 #### Electron Target 💻
