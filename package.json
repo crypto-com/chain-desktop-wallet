@@ -409,6 +409,8 @@
     "word-wrap": "1.2.4",
     "@babel/traverse": "7.23.2",
     "get-func-name": "2.0.0",
-    "browserify-sign": "4.2.2"
+    "browserify-sign": "4.2.2",
+    "ws": "8.17.1",
+    "braces": "3.0.3"
   }
 }
