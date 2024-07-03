@@ -211,8 +211,8 @@ app.on('ready', async function () {
       responseHeaders: {
         ...details.responseHeaders,
         'Content-Security-Policy': ['\
-default-src '+(isDev ? 'devtools: ':'')+'\'self\' http: https: ws: wss: \'unsafe-inline\' data: blob: ;\
-script-src '+(isDev ? 'devtools: ':'')+'\'self\' http: https: ws: wss: \'unsafe-inline\' \'unsafe-eval\' ;\
+default-src '+(isDev ? 'devtools: ':'')+'\'self\' http: https: ws: wss: \'unsafe-inline\' data: blob: ; \
+script-src '+(isDev ? 'devtools: ':'')+'\'self\' http: https: ws: wss: \'unsafe-inline\' \'unsafe-eval\' ; \
 ']
       }
     })
