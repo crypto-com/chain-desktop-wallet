@@ -1,4 +1,4 @@
-import { app, BrowserWindow, nativeImage, ipcMain } from 'electron';
+import { app, BrowserWindow, nativeImage, ipcMain, session } from 'electron';
 import * as remoteMain from '@electron/remote/main';
 
 import * as path from 'path';
@@ -148,6 +148,15 @@ function createWindow() {
     require('electron').shell.openExternal(finalURL);
   });
 
+
+  win.webContents.on('did-start-navigation',(e, url, isInPlace, isMainFrame) => {
+    e.preventDefault();
+    const { isValid, finalURL } = isValidURL(url);
+    if (!isValid) {
+      return;
+    }
+  });
+
   // Hot Reloading
   if (isDev) {
     // 'node_modules/.bin/electronPath'
@@ -195,6 +204,20 @@ app.on('ready', async function () {
   if (!autoUpdateExpireTime) {
     autoUpdater.checkForUpdatesAndNotify();
   }
+
+
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': ['\
+default-src '+(isDev ? 'devtools: ':'')+'\'self\' http: https: \'unsafe-inline\' data: blob: ;\
+script-src '+(isDev ? 'devtools: ':'')+'\'self\' http: https: \'unsafe-inline\' \'unsafe-eval\' ;\
+']
+      }
+    })
+  })
+
 });
 
 app.on('web-contents-created', (event, contents) => {
@@ -212,7 +235,6 @@ app.on('web-contents-created', (event, contents) => {
   if (contents.getType() == 'webview') {
     // blocks any new windows from being opened
     contents.setWindowOpenHandler((detail) => {
-
       const { isValid } = isValidURL(detail.url);
 
       if (isValid) {
@@ -277,5 +299,3 @@ ipcMain.on('restart_app', () => {
   app.relaunch();
   app.exit(0);
 });
-
-
