@@ -9,7 +9,7 @@
   "main": "build/electron/main.js",
   "private": true,
   "scripts": {
-    "run-audit": "yarn audit-ci --high -a 1094574 1096494 1096698 1096729 1096804 1096993 1097346",
+    "run-audit": "yarn audit-ci --high -a 1094574 1096494 1096729 1096993 1097346 1097617",
     "start": "node scripts/start.js",
     "build": "cross-env NODE_OPTIONS=\"--max_old_space_size=8192\" && yarn clean-builds && node scripts/build.js",
     "test": "node scripts/test.js --watchAll=false",
@@ -162,7 +162,7 @@
     "dotenv": "8.2.0",
     "dotenv-expand": "5.1.0",
     "electron": "19.1.9",
-    "electron-builder": "23.2.0",
+    "electron-builder": "24.13.2",
     "electron-builder-notarize": "1.5.0",
     "eslint": "7.23.0",
     "eslint-config-airbnb": "^18.2.1",
@@ -414,6 +414,8 @@
     "word-wrap": "1.2.4",
     "@babel/traverse": "7.23.2",
     "get-func-name": "2.0.0",
-    "browserify-sign": "4.2.2"
+    "browserify-sign": "4.2.2",
+    "ws": "8.17.1",
+    "braces": "3.0.3"
   }
 }
