@@ -9,7 +9,7 @@
   "main": "build/electron/main.js",
   "private": true,
   "scripts": {
-    "run-audit": "yarn audit-ci --high -a 1094574 1096494 1096698 1096729 1096804 1096993 1097346",
+    "run-audit": "yarn audit-ci --high -a 1094574 1096494 1096729 1096993 1097346 1097617",
     "start": "node scripts/start.js",
     "build": "cross-env NODE_OPTIONS=\"--max_old_space_size=8192\" && yarn clean-builds && node scripts/build.js",
     "test": "node scripts/test.js --watchAll=false",
@@ -290,9 +290,14 @@
   },
   "browserslist": {
     "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
+      "Chrome >= 67",
+      "ChromeAndroid >= 67",
+      "Edge >= 79",
+      "Firefox >= 68",
+      "FirefoxAndroid >= 68",
+      "Opera >= 54",
+      "Safari >= 14",
+      "iOS >= 14"
     ],
     "development": [
       "last 1 chrome version",
