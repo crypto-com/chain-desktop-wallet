@@ -762,7 +762,7 @@ export class TransactionHistoryService {
       .filter(token => token.type === SupportedCRCTokenStandard.CRC_20_TOKEN)
       .map(async token => {
         const newCRC20Token: UserAsset = {
-          balance: token.balance,
+          balance: token.balance.toString(),
           decimals: Number(token.decimals),
           contractAddress: token.contractAddress,
           description: `${token.name} (${token.symbol})`,
