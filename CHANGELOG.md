@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v1.5.1] - 2024-07-05
+### Additions
+- Security enhancement on DApp Browser
+- web3 library dependencies bump
 ## [v1.5.0] - 2024-03-12
 ### Additions
 - Security enhancement on DApp Browser
