@@ -313,11 +313,17 @@ interface ValidURLCheckResult {
 
 export function isValidURL(str: string): ValidURLCheckResult {
   try {
-    // if (!str.startsWith('https://') && !str.startsWith('http://')) {
-    //   str = 'https://' + str;
-    // }
     const parsedUrl = new URL(str);
     const regex = /^([a-zA-Z0-9-_.:]+)+$/;
+
+    if(parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:' 
+    && parsedUrl.protocol !== 'ws:' && parsedUrl.protocol !== 'wss:') {
+      return { 
+        isValid: false, 
+        finalURL: str 
+      };
+    }
+
     return {
       isValid: regex.test(parsedUrl.host),
       finalURL: str
