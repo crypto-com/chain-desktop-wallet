@@ -1,6 +1,5 @@
-import Web3 from 'web3';
-
-const { isAddress, toChecksumAddress } = Web3.utils;
+import { toChecksumAddress } from 'web3-utils';
+import { isAddress } from 'web3-validator';
 
 const TRUSTWALLET_ASSETS_BASE_URI = 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/';
 

@@ -1,6 +1,6 @@
 import { BigNumberish, ethers } from 'ethers';
 import Web3 from 'web3';
-import { AbiItem } from 'web3-utils';
+import { AbiItem, toHex, utf8ToHex } from 'web3-utils';
 import { signTypedData_v4 } from 'eth-sig-util';
 import { ITransactionSigner } from './TransactionSigner';
 import TokenContractABI from './abi/TokenContractABI.json';
@@ -24,6 +24,7 @@ import { IERC20__factory } from '../../contracts';
 import { DerivationPathStandard } from './LedgerSigner';
 
 const DEFAULT_CHAIN_ID = 338;
+const DEFAULT_PROVIDER = 'http://localhost:8545';
 
 class EvmTransactionSigner implements ITransactionSigner {
   // eslint-disable-next-line class-methods-use-this
@@ -31,23 +32,22 @@ class EvmTransactionSigner implements ITransactionSigner {
     transaction: TransferTransactionUnsigned,
     phrase: string,
   ): Promise<string> {
-    const web3 = new Web3('');
     const transferAsset = transaction.asset;
 
-    const gasPriceBN = web3.utils.toBN(
+    const gasPriceBN = ethers.BigNumber.from(
       transferAsset?.config?.fee?.networkFee! || (transaction.gasPrice ?? '0'),
     );
 
     const chainId = transaction?.asset?.config?.chainId || DEFAULT_CHAIN_ID;
-    const txParams = {
-      nonce: web3.utils.toHex(transaction.nonce || 0),
-      gasPrice: web3.utils.toHex(gasPriceBN),
+    const txParams: ethers.providers.TransactionRequest = {
+      nonce: toHex(transaction.nonce || 0),
+      gasPrice: gasPriceBN.toHexString(),
       gasLimit: parseInt(transferAsset?.config?.fee?.gasLimit ?? '0') || transaction.gasLimit,
       to: transaction.toAddress,
-      value: web3.utils.toHex(transaction.amount),
+      value: ethers.BigNumber.from(transaction.amount),
       data:
         transaction.memo && transaction.memo.length > 0
-          ? web3.utils.utf8ToHex(transaction.memo)
+          ? utf8ToHex(transaction.memo)
           : '0x',
       chainId: Number(chainId),
     };
@@ -185,7 +185,6 @@ class EvmTransactionSigner implements ITransactionSigner {
     transaction: TransferTransactionUnsigned,
     phrase: string,
   ): Promise<string> {
-    const web3 = new Web3('');
     const transferAsset = transaction.asset;
 
     if (!transferAsset?.contractAddress) {
@@ -199,7 +198,7 @@ class EvmTransactionSigner implements ITransactionSigner {
       throw new TypeError('The asset type is expected to be a CRC_20_TOKEN or ERC_20_TOKEN');
     }
 
-    const gasPriceBN = web3.utils.toBN(
+    const gasPriceBN = ethers.BigNumber.from(
       transaction.gasPrice || transferAsset?.config?.fee?.networkFee!,
     );
     const encodedTokenTransfer = this.encodeTokenTransferABI(
@@ -209,8 +208,8 @@ class EvmTransactionSigner implements ITransactionSigner {
 
     const chainId = transaction?.asset?.config?.chainId || DEFAULT_CHAIN_ID;
     const txParams = {
-      nonce: web3.utils.toHex(transaction.nonce || 0),
-      gasPrice: web3.utils.toHex(gasPriceBN),
+      nonce: toHex(transaction.nonce || 0),
+      gasPrice: gasPriceBN.toHexString(),
       gasLimit: transaction.gasLimit || transferAsset?.config?.fee?.gasLimit,
       to: transferAsset.contractAddress,
       value: 0,
@@ -227,7 +226,7 @@ class EvmTransactionSigner implements ITransactionSigner {
     tokenContractAddress: string,
     transaction: TransferTransactionUnsigned,
   ) {
-    const web3 = new Web3('');
+    const web3 = new Web3(new Web3.providers.HttpProvider(DEFAULT_PROVIDER));
     const contractABI = TokenContractABI.abi as AbiItem[];
     const contract = new web3.eth.Contract(contractABI, tokenContractAddress);
     return contract.methods.transfer(transaction.toAddress, transaction.amount).encodeABI();
@@ -245,7 +244,7 @@ class EvmTransactionSigner implements ITransactionSigner {
 
   // eslint-disable-next-line class-methods-use-this
   public encodeNFTTransferABI(tokenContractAddress: string, transaction: EVMNFTTransferUnsigned) {
-    const web3 = new Web3('');
+    const web3 = new Web3(new Web3.providers.HttpProvider(DEFAULT_PROVIDER));
     const contractABI = CRC721TokenContractABI.abi as AbiItem[];
     const contract = new web3.eth.Contract(contractABI, tokenContractAddress);
     return contract.methods
@@ -262,7 +261,7 @@ class EvmTransactionSigner implements ITransactionSigner {
     if (!asset.config?.nodeUrl) {
       throw new TypeError('Missing config Node URL');
     }
-    const web3 = new Web3(asset.config.nodeUrl);
+    const web3 = new Web3(new Web3.providers.HttpProvider(asset.config.nodeUrl));
     const contractABI = CRC721TokenContractABI.abi as AbiItem[];
     const contract = new web3.eth.Contract(contractABI, tokenContractAddress);
     return contract.methods
@@ -275,17 +274,15 @@ class EvmTransactionSigner implements ITransactionSigner {
     transaction: BridgeTransactionUnsigned,
     phrase: string,
   ): Promise<string> {
-    const web3 = new Web3('');
-
     const transferAsset = transaction.originAsset;
     const chainId = transaction?.asset?.config?.chainId || 338;
 
     const txParams = {
-      nonce: web3.utils.toHex(transaction.nonce || 0),
-      gasPrice: web3.utils.toHex(transaction.gasPrice || transferAsset?.config?.fee?.networkFee!),
+      nonce: toHex(transaction.nonce || 0),
+      gasPrice: ethers.BigNumber.from(transaction.gasPrice || transferAsset?.config?.fee?.networkFee!).toHexString(),
       gasLimit: transaction.gasLimit,
       to: transaction.toAddress,
-      value: web3.utils.toHex(transaction.amount),
+      value: ethers.BigNumber.from(transaction.amount),
       data: transaction.data,
       chainId: Number(chainId),
     };

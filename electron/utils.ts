@@ -1,11 +1,28 @@
-export function isValidURL(str: string) {
-    const regex = new RegExp(
-      '^(http[s]?:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?', // lgtm [js/redos]
-    );
-  
-    const withoutPrefixRegex = new RegExp(
-      '^([0-9A-Za-z-\\.@:%_+~#=]+)+((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?', // lgtm [js/redos]
-    );
-    return regex.test(str) || withoutPrefixRegex.test(str);
+import { URL } from 'url';
+
+interface ValidURLCheckResult {
+  isValid: boolean;
+  finalURL: string;
 }
-  
+
+export function isValidURL(str: string): ValidURLCheckResult {
+  try {
+    const parsedUrl = new URL(str);
+    const regex = /^([a-zA-Z0-9-_.:]+)+$/;
+
+    if(parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:' 
+    && parsedUrl.protocol !== 'ws:' && parsedUrl.protocol !== 'wss:') {
+      return { 
+        isValid: false, 
+        finalURL: str 
+      };
+    }
+
+    return {
+      isValid: regex.test(parsedUrl.host),
+      finalURL: parsedUrl.toString()
+    };
+  } catch (e) {
+    return { isValid: false, finalURL: str };
+  }
+}

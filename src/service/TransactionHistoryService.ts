@@ -136,7 +136,7 @@ export class TransactionHistoryService {
           return {
             ...validator,
             apy: matchValidator?.apy,
-            uptime: totalRecentSignedBlocks / (totalRecentActiveBlocks > 0 ? totalRecentActiveBlocks : 100), // avoid div by zero
+            uptime: (totalRecentSignedBlocks / (totalRecentActiveBlocks > 0 ? totalRecentActiveBlocks : 100)).toString(), // avoid div by zero
           };
         })
         // Group validators by recent uptime >= 98% & uptime < 98%
@@ -762,7 +762,7 @@ export class TransactionHistoryService {
       .filter(token => token.type === SupportedCRCTokenStandard.CRC_20_TOKEN)
       .map(async token => {
         const newCRC20Token: UserAsset = {
-          balance: token.balance,
+          balance: token.balance.toString(),
           decimals: Number(token.decimals),
           contractAddress: token.contractAddress,
           description: `${token.name} (${token.symbol})`,

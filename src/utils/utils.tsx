@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { bech32 } from 'bech32';
 import { ethers } from 'ethers';
 import { CroNetwork } from '@crypto-org-chain/chain-jslib';
-import Web3 from 'web3';
+import { toChecksumAddress } from 'web3-utils';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
 import { Network, WalletConfig, SupportedChainName } from '../config/StaticConfig';
 import { CRC20MainnetTokenInfos } from '../config/CRC20Tokens';
@@ -210,9 +210,9 @@ export function getChainName(name: string | undefined = '', config: WalletConfig
         return name.replace('Chain', 'Goerli Testnet');
 
       case SupportedChainName.CRONOS_TENDERMINT: {
-        if(config.network.chainId.indexOf('croeseid-4') !== -1)
+        if (config.network.chainId.indexOf('croeseid-4') !== -1)
           return name.replace('Chain', 'Testnet Croeseid 4');
-          
+
         return name.replace('Chain', 'Testnet Croeseid 5');
       }
       default:
@@ -293,7 +293,7 @@ export function getAllERC20WhiteListedAddress() {
 }
 
 export function isAddressEqual(lhs: string, rhs: string) {
-  return Web3.utils.toChecksumAddress(lhs) === Web3.utils.toChecksumAddress(rhs);
+  return toChecksumAddress(lhs) === toChecksumAddress(rhs);
 }
 
 export function isLocalhostURL(str: string) {
@@ -306,16 +306,33 @@ export function isLocalhostURL(str: string) {
   }
 }
 
-export function isValidURL(str: string) {
-  const regex = new RegExp(
-    '^(http[s]?:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?', // lgtm [js/redos]
-  );
-
-  const withoutPrefixRegex = new RegExp(
-    '^([0-9A-Za-z-\\.@:%_+~#=]+)+((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?', // lgtm [js/redos]
-  );
-  return regex.test(str) || withoutPrefixRegex.test(str);
+interface ValidURLCheckResult {
+  isValid: boolean;
+  finalURL: string;
 }
+
+export function isValidURL(str: string): ValidURLCheckResult {
+  try {
+    const parsedUrl = new URL(str);
+    const regex = /^([a-zA-Z0-9-_.:]+)+$/;
+
+    if(parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:' 
+    && parsedUrl.protocol !== 'ws:' && parsedUrl.protocol !== 'wss:') {
+      return { 
+        isValid: false, 
+        finalURL: str 
+      };
+    }
+
+    return {
+      isValid: regex.test(parsedUrl.host),
+      finalURL: parsedUrl.toString()
+    };
+  } catch (e) {
+    return { isValid: false, finalURL: str };
+  }
+}
+
 
 export function addHTTPsPrefixIfNeeded(str: string) {
   if (str.startsWith('http://') || str.startsWith('https://')) {
@@ -326,5 +343,5 @@ export function addHTTPsPrefixIfNeeded(str: string) {
 }
 
 export function isHexEqual(lhs: string, rhs: string) {
-  return Web3.utils.toHex(lhs) === Web3.utils.toHex(rhs);
+  return ethers.BigNumber.from(lhs).toHexString() === ethers.BigNumber.from(rhs).toHexString();
 }

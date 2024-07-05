@@ -1,6 +1,8 @@
 import Web3 from 'web3';
-import { BlockTransactionObject, TransactionReceipt, TransactionConfig } from 'web3-eth';
-import { AbiItem } from 'web3-utils';
+import { ethers } from 'ethers';
+import { Block, TransactionReceipt, Transaction } from 'web3-types';
+import { AbiItem, bytesToHex } from 'web3-utils';
+import { isHex, isAddress } from 'web3-validator';
 import { IEvmRpc } from '../interface/evm.rpcClient';
 import TokenContractABI from '../../../service/signers/abi/TokenContractABI.json';
 
@@ -36,27 +38,27 @@ class EVMClient implements IEvmRpc {
   }
 
   public async getChainId(): Promise<number> {
-    return await this.web3.eth.getChainId();
+    return ethers.BigNumber.from(await this.web3.eth.getChainId()).toNumber();
   }
 
   // Address
   async getNativeBalanceByAddress(address: string): Promise<string> {
-    if (!this.web3.utils.isAddress(address)) {
+    if (!isAddress(address)) {
       throw new Error('Please provide a valid EVM compatible address.');
     }
 
-    const nativeBalance = await this.web3.eth.getBalance(address, 'latest');
+    const nativeBalance = await ethers.BigNumber.from(await this.web3.eth.getBalance(address, 'latest')).toString();
     return nativeBalance;
   }
 
   async getBalanceOfContractByAddress(tokenContractAddress: string, address: string): Promise<string> {
-    if (!this.web3.utils.isAddress(address) || !this.web3.utils.isAddress(tokenContractAddress)) {
+    if (!isAddress(address) || !isAddress(tokenContractAddress)) {
       throw new Error('Please provide a valid EVM compatible address.');
     }
 
     const contractABI = TokenContractABI.abi as AbiItem[];
     const contract = new this.web3.eth.Contract(contractABI, tokenContractAddress);
-    const tokenBalance = contract.methods.balanceOf(address).call();
+    const tokenBalance = (contract.methods.balanceOf(address).call() as Promise<string>);
 
     return tokenBalance;
   }
@@ -66,15 +68,15 @@ class EVMClient implements IEvmRpc {
     decimals: string;
     symbol: string;
   }> {
-    if (!this.web3.utils.isAddress(tokenContractAddress)) {
+    if (!isAddress(tokenContractAddress)) {
       throw new Error('Please provide a valid EVM compatible address.');
     }
 
     const contractABI = TokenContractABI.abi as AbiItem[];
     const contract = new this.web3.eth.Contract(contractABI, tokenContractAddress);
-    const name = await contract.methods.name().call();
-    const decimals = await contract.methods.decimals().call();
-    const symbol = await contract.methods.symbol().call();
+    const name = await (contract.methods.name().call() as Promise<string>);
+    const decimals = await (contract.methods.decimals().call() as Promise<string>);
+    const symbol = await (contract.methods.symbol().call() as Promise<string>);
 
     return {
       name,
@@ -84,11 +86,11 @@ class EVMClient implements IEvmRpc {
   }
 
   async getNextNonceByAddress(address: string): Promise<number> {
-    if (!this.web3.utils.isAddress(address)) {
+    if (!isAddress(address)) {
       throw new Error('Please provide a valid EVM compatible address.');
     }
     const pendingNonce = await this.web3.eth.getTransactionCount(address, 'pending');
-    return pendingNonce;
+    return parseInt(pendingNonce.toString());
   }
 
   // Transaction
@@ -102,37 +104,37 @@ class EVMClient implements IEvmRpc {
 
   // Fees
   async getEstimatedGasPrice(): Promise<string> {
-    const estimatedGasPrice = await this.web3.eth.getGasPrice();
+    const estimatedGasPrice = (await this.web3.eth.getGasPrice()).toString();
     return estimatedGasPrice;
   }
 
-  async estimateGas(txConfig: TransactionConfig): Promise<number> {
-    const estimatedGas = await this.web3.eth.estimateGas(txConfig);
+  async estimateGas(txConfig: Transaction): Promise<number> {
+    const estimatedGas = ethers.BigNumber.from(await this.web3.eth.estimateGas(txConfig)).toNumber();
     return estimatedGas;
   }
 
   // Block
   async getLatestBlockHeight(): Promise<number> {
-    const blockHeight = await this.web3.eth.getBlockNumber();
+    const blockHeight = ethers.BigNumber.from(await this.web3.eth.getBlockNumber()).toNumber();
     return blockHeight;
   }
 
-  async getBlock(blockHashOrBlockNumber: number | string): Promise<BlockTransactionObject> {
+  async getBlock(blockHashOrBlockNumber: number | string): Promise<Block> {
     const blockTransactions = await this.web3.eth.getBlock(blockHashOrBlockNumber, true);
     return blockTransactions;
   }
 
-  async getBlockByHeight(height: number): Promise<BlockTransactionObject> {
+  async getBlockByHeight(height: number): Promise<Block> {
     return await this.getBlock(height);
   }
 
-  async getBlockByHash(blockHash: string): Promise<BlockTransactionObject> {
+  async getBlockByHash(blockHash: string): Promise<Block> {
     return await this.getBlock(blockHash);
   }
 
   // Broadcast
   async broadcastRawTransactionHex(signedTxHex: string): Promise<string> {
-    if (!this.web3.utils.isHex(signedTxHex)) {
+    if (!isHex(signedTxHex)) {
       throw new Error('Please provide a valid Hex string.');
     }
     if (!signedTxHex.startsWith('0x')) {
@@ -142,17 +144,22 @@ class EVMClient implements IEvmRpc {
     let broadcastTxHash = '';
 
     try {
-      const broadcastTx = await this.web3.eth.sendSignedTransaction(signedTxHex, (err, hash) => {
+      // const broadcastTx = await this.web3.eth.sendSignedTransaction(signedTxHex, (err, hash) => {
+      //   broadcastTxHash = hash;
+      // });
+
+      const broadcastTx = await this.web3.eth.sendSignedTransaction(signedTxHex).on('transactionHash', (hash) => {
         broadcastTxHash = hash;
       });
+
       if (broadcastTx.status) {
-        return broadcastTx.transactionHash;
+        return bytesToHex(broadcastTx.transactionHash);
       }
     } catch (e) {
       if (broadcastTxHash) {
         return broadcastTxHash;
       }
-      throw new Error(e.message);
+      throw new Error((e as Error).message);
     }
     throw new Error('Transaction broadcast failed.');
   }

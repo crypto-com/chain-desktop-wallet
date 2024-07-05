@@ -1,5 +1,5 @@
-import Web3 from 'web3';
-import { TransactionConfig } from 'web3-eth';
+import { toWei } from 'web3-utils';
+import { Transaction } from 'web3-types';
 import { ethers } from 'ethers';
 import Big from 'big.js';
 import {
@@ -107,11 +107,10 @@ export class TransactionSenderService {
             asset: currentAsset,
           };
 
-          const web3 = new Web3('');
-          const txConfig: TransactionConfig = {
+          const txConfig: Transaction = {
             from: currentAsset.address,
             to: transferRequest.toAddress,
-            value: web3.utils.toWei(transferRequest.amount, 'ether'),
+            value: toWei(transferRequest.amount, 'ether'),
           };
 
           const prepareTxInfo = await this.transactionPrepareService.prepareEVMTransaction(
@@ -133,18 +132,17 @@ export class TransactionSenderService {
           if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
             const device = createLedgerDevice();
 
-            const gasLimitTx = web3.utils.toBN(transfer.gasLimit!);
-            const gasPriceTx = web3.utils.toBN(transfer.gasPrice);
-
+            const gasLimitTx = ethers.BigNumber.from(transfer.gasLimit!).toHexString();
+            const gasPriceTx = ethers.BigNumber.from(transfer.gasPrice).toHexString();
             signedTx = await device.signEthTx(
               walletAddressIndex,
               walletDerivationPathStandard,
               Number(transfer.asset?.config?.chainId), // chainid
               transfer.nonce,
-              web3.utils.toHex(gasLimitTx) /* gas limit */,
-              web3.utils.toHex(gasPriceTx) /* gas price */,
+              gasLimitTx /* gas limit */,
+              gasPriceTx /* gas price */,
               transfer.toAddress,
-              web3.utils.toHex(transfer.amount),
+              ethers.BigNumber.from(transfer.amount).toHexString(),
               `0x${Buffer.from(transfer.memo).toString('hex')}`,
             );
           } else {
@@ -206,8 +204,7 @@ export class TransactionSenderService {
             transfer,
           );
 
-          const web3 = new Web3('');
-          const txConfig: TransactionConfig = {
+          const txConfig: Transaction = {
             from: transferAsset.address,
             to: transferAsset.contractAddress,
             value: 0,
@@ -222,8 +219,8 @@ export class TransactionSenderService {
           const staticTokenTransferGasLimit = 130_000;
 
           transfer.nonce = prepareTxInfo.nonce;
-          transfer.gasPrice = prepareTxInfo.loadedGasPrice;
-          transfer.gasLimit = staticTokenTransferGasLimit;
+          transfer.gasPrice = Math.max(ethers.BigNumber.from(prepareTxInfo.loadedGasPrice).toNumber(), ethers.BigNumber.from(transferRequest.asset.config?.fee.networkFee!).toNumber()).toString();
+          transfer.gasLimit = Math.max(staticTokenTransferGasLimit, ethers.BigNumber.from(transferRequest.asset.config?.fee.gasLimit!).toNumber());
 
           // eslint-disable-next-line no-console
           console.log('TX_DATA', { gasLimit: transfer.gasLimit });
@@ -232,16 +229,16 @@ export class TransactionSenderService {
           if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
             const device = createLedgerDevice();
 
-            const gasLimitTx = web3.utils.toBN(transfer.gasLimit!);
-            const gasPriceTx = web3.utils.toBN(transfer.gasPrice);
+            const gasLimitTx = ethers.BigNumber.from(transfer.gasLimit!).toHexString();
+            const gasPriceTx = ethers.BigNumber.from(transfer.gasPrice!).toHexString();
 
             signedTx = await device.signEthTx(
               walletAddressIndex,
               walletDerivationPathStandard,
               Number(transfer.asset?.config?.chainId), // chainid
               transfer.nonce,
-              web3.utils.toHex(gasLimitTx) /* gas limit */,
-              web3.utils.toHex(gasPriceTx) /* gas price */,
+              gasLimitTx /* gas limit */,
+              gasPriceTx /* gas price */,
               transferAsset.contractAddress,
               '0x0',
               encodedABITokenTransfer,
@@ -858,7 +855,7 @@ export class TransactionSenderService {
           },
         );
 
-        const prepareTXConfig: TransactionConfig = {
+        const prepareTXConfig: Transaction = {
           from: sender,
           to: recipient,
           data: encodedABITokenTransferData,

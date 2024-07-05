@@ -1,4 +1,4 @@
-import { app, BrowserWindow, nativeImage, ipcMain } from 'electron';
+import { app, BrowserWindow, nativeImage, ipcMain, session } from 'electron';
 import * as remoteMain from '@electron/remote/main';
 
 import * as path from 'path';
@@ -141,10 +141,20 @@ function createWindow() {
   // Open default browser when direct to external
   win.webContents.on('new-window', function (e, url) {
     e.preventDefault();
-    if (!isValidURL(url)) {
+    const { isValid, finalURL } = isValidURL(url);
+    if (!isValid) {
       return;
     }
-    require('electron').shell.openExternal(url);
+    require('electron').shell.openExternal(finalURL);
+  });
+
+
+  win.webContents.on('did-start-navigation',(e, url, isInPlace, isMainFrame) => {
+    e.preventDefault();
+    const { isValid, finalURL } = isValidURL(url);
+    if (!isValid) {
+      return;
+    }
   });
 
   // Hot Reloading
@@ -191,16 +201,31 @@ app.on('ready', async function () {
   await new Promise(resolve => setTimeout(resolve, 20_000));
 
   const autoUpdateExpireTime = store.get('autoUpdateExpireTime');
-  if(!autoUpdateExpireTime) {
+  if (!autoUpdateExpireTime) {
     autoUpdater.checkForUpdatesAndNotify();
   }
+
+
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': ['\
+default-src '+(isDev ? 'devtools: ':'')+'\'self\' http: https: ws: wss: \'unsafe-inline\' data: blob: ; \
+script-src '+(isDev ? 'devtools: ':'')+'\'self\' http: https: ws: wss: \'unsafe-inline\' \'unsafe-eval\' ; \
+']
+      }
+    })
+  })
+
 });
 
 app.on('web-contents-created', (event, contents) => {
-  
+
   if (contents.getType() == 'window') {
     contents.on('will-navigate', (event, url) => {
-      if (!isValidURL(url)) {
+      const { isValid } = isValidURL(url);
+      if (!isValid) {
         event.preventDefault();
         return;
       }
@@ -210,39 +235,44 @@ app.on('web-contents-created', (event, contents) => {
   if (contents.getType() == 'webview') {
     // blocks any new windows from being opened
     contents.setWindowOpenHandler((detail) => {
+      const { isValid } = isValidURL(detail.url);
 
-      if (isValidURL(detail.url)) {
-        return {action: 'allow'};
+      if (isValid) {
+        return { action: 'allow' };
       }
 
       console.log('open url reject, not valid', detail.url);
-      return {action: 'deny'};
+      return { action: 'deny' };
     })
-    
+
     // new-window api deprecated, but still working for now
     contents.on('new-window', (event, url, frameName, disposition, options) => {
       options.webPreferences = {
         ...options.webPreferences,
         javascript: false,
       };
-      
-      if (!isValidURL(url)) {
+
+      const { isValid, finalURL } = isValidURL(url);
+
+      if (!isValid) {
         event.preventDefault();
         return;
       }
 
-      require('electron').shell.openExternal(url);
+      require('electron').shell.openExternal(finalURL);
     })
 
     contents.on('will-navigate', (event, url) => {
-      if (!isValidURL(url)) {
+      const { isValid } = isValidURL(url);
+      if (!isValid) {
         event.preventDefault();
       }
     })
 
     // blocks 301/302 redirect if the url is not valid
     contents.on('will-redirect', (event, url) => {
-      if (!isValidURL(url)) {
+      const { isValid } = isValidURL(url);
+      if (!isValid) {
         event.preventDefault();
       }
     })
@@ -269,5 +299,3 @@ ipcMain.on('restart_app', () => {
   app.relaunch();
   app.exit(0);
 });
-
-

@@ -1,4 +1,4 @@
-import { BlockTransactionObject, TransactionReceipt, TransactionConfig } from 'web3-eth';
+import { Block, TransactionReceipt, Transaction } from 'web3-types';
 
 export interface IEvmRpc {
   // Node
@@ -14,13 +14,13 @@ export interface IEvmRpc {
 
   // Fees
   getEstimatedGasPrice(): Promise<string>;
-  estimateGas(txConfig: TransactionConfig): Promise<number>;
+  estimateGas(txConfig: Transaction): Promise<number>;
 
   // Block
   getLatestBlockHeight(): Promise<number>;
-  getBlock(blockHashOrBlockNumber: number | string): Promise<BlockTransactionObject>;
-  getBlockByHeight(height: number): Promise<BlockTransactionObject>;
-  getBlockByHash(blockHash: string): Promise<BlockTransactionObject>;
+  getBlock(blockHashOrBlockNumber: number | string): Promise<Block>;
+  getBlockByHeight(height: number): Promise<Block>;
+  getBlockByHash(blockHash: string): Promise<Block>;
 
   // Broadcast
   broadcastRawTransactionHex(signedTxHex: string): Promise<string>;
