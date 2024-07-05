@@ -326,7 +326,7 @@ export function isValidURL(str: string): ValidURLCheckResult {
 
     return {
       isValid: regex.test(parsedUrl.host),
-      finalURL: str
+      finalURL: parsedUrl.toString()
     };
   } catch (e) {
     return { isValid: false, finalURL: str };
