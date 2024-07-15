@@ -71,6 +71,9 @@ jobs:
           mkdir -p ~/private_keys/
           echo '${{ secrets.mac_api_key }}' > ~/private_keys/AuthKey_${{ secrets.mac_api_key_id }}.p8
 
+      - name: Check notarytool
+        run: xcrun notarytool version
+
       - name: Build/release Electron app (MacOS, Ubuntu, Windows)
         uses: samuelmeuli/action-electron-builder@v1
         # if: startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')
@@ -95,10 +98,6 @@ jobs:
           API_KEY_ISSUER_ID: ${{ secrets.mac_api_key_issuer_id }}
           # Login to Snap Store
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_TOKEN }}
-
-      - name: List files in dist directory
-        if: always()
-        run: ls -R /Users/runner/work/chain-desktop-wallet/chain-desktop-wallet
 
       - name: Upload notarization-error.log
         uses: actions/upload-artifact@v2
