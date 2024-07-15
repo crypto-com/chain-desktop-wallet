@@ -98,7 +98,7 @@ jobs:
       
       - name: Upload notarization-error.log
         uses: actions/upload-artifact@v2
-        if: failure()
+        if: always()
         with:
           name: notarization-error.log
           path: dist/notarization-error.log
