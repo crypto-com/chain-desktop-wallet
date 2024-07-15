@@ -72,7 +72,7 @@ jobs:
           echo '${{ secrets.mac_api_key }}' > ~/private_keys/AuthKey_${{ secrets.mac_api_key_id }}.p8
 
       - name: Check notarytool
-        run: xcrun notarytool version
+        run: xcrun notarytool help
 
       - name: Build/release Electron app (MacOS, Ubuntu, Windows)
         uses: samuelmeuli/action-electron-builder@v1
