@@ -98,14 +98,14 @@ jobs:
 
       - name: List files in dist directory
         if: always()
-        run: ls -R dist
+        run: ls -R /Users/runner/work/chain-desktop-wallet/chain-desktop-wallet
 
       - name: Upload notarization-error.log
         uses: actions/upload-artifact@v2
         if: always()
         with:
           name: notarization-error.log
-          path: /Users/runner/work/chain-desktop-wallet/chain-desktop-wallet/dist/notarization-error.log
+          path: /Users/runner/work/chain-desktop-wallet/chain-desktop-wallet/notarization-error.log
 
       - name: Build Electron app (Windows)
         if: startsWith(matrix.os, 'windows')
