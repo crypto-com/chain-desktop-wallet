@@ -98,7 +98,7 @@ jobs:
 
       - name: List files in dist directory
         if: always()
-        run: ls -l dist
+        run: ls -R dist
 
       - name: Upload notarization-error.log
         uses: actions/upload-artifact@v2
