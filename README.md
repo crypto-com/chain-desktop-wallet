@@ -3,7 +3,7 @@
 ## Warning
 Crypto.com DeFi Desktop Wallet may subject to changes. Before proceeding, please be aware of the following:
 
-- This product is under maintenance.
+- This product is in maintenance mode.
 - Crypto.com is not liable for any potential damage, loss of data/files arising from the use of the wallet.
 
 ## Latest releases
