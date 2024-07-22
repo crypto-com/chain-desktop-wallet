@@ -334,7 +334,7 @@ function HomeLayout(props: HomeLayoutProps) {
     const ethAsset = getEthereumEvmAsset(assets);
     const isTestnet = checkIfTestnet(walletSession.wallet.config.network);
 
-    const checkDefaultCronosPosExplorerUrl = CRONOS_TENDERMINT_ASSET(walletSession.wallet.config).config.explorerUrl;
+    const { nodeUrl: checkDefaultCronosPosNodeUrl, explorerUrl: checkDefaultCronosPosExplorerUrl } = CRONOS_TENDERMINT_ASSET(walletSession.wallet.config).config;
 
     const checkDefaultCronosExplorerUrl = isTestnet
       ? TestNetEvmConfig.explorerUrl
@@ -345,12 +345,11 @@ function HomeLayout(props: HomeLayoutProps) {
       : MAINNET_ETHEREUM_EXPLORER_URL;
 
     setTimeout(async () => {
-
-      console.log('checkCorrectExplorerUrl', cronosTendermintAsset?.config?.explorerUrl, checkDefaultCronosPosExplorerUrl);
       if (
         !walletSession.activeAsset?.config?.explorer ||
         // Check if explorerUrl has been updated with latest default
         cronosTendermintAsset?.config?.explorerUrl !== checkDefaultCronosPosExplorerUrl || 
+        cronosTendermintAsset?.config?.nodeUrl !== checkDefaultCronosPosNodeUrl ||
         cronosAsset?.config?.explorerUrl !== checkDefaultCronosExplorerUrl ||
         ethAsset?.config?.explorerUrl !== checkDefaultEthExplorerUrl || 
         // Check if there are latest tendermintNetwork on Cronos Tendermint

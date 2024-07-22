@@ -120,9 +120,9 @@ export const GeneralSettingsForm = props => {
 
   function onApplyTestnetCroeseid4() {
     props.form.setFieldsValue({
-      nodeUrl: 'https://rpc-testnet-croeseid-4.crypto.org',
-      clientUrl: 'https://rpc-testnet-croeseid-4.crypto.org',
-      proxyUrl: 'https://rest-testnet-croeseid-4.crypto.org',
+      nodeUrl: 'https://rpc-testnet-croeseid-4.cronos-pos.org',
+      clientUrl: 'https://rpc-testnet-croeseid-4.cronos-pos.org',
+      proxyUrl: 'https://rest-testnet-croeseid-4.cronos-pos.org',
       indexingUrl: 'https://cronos-pos.org/explorer/croeseid4/api/v1/',
       chainId: 'testnet-croeseid-4'
     });
@@ -130,9 +130,9 @@ export const GeneralSettingsForm = props => {
 
   function onApplyTestnetCroeseid5() {
     props.form.setFieldsValue({
-      nodeUrl: 'https://rpc-c5.crypto.org',
-      clientUrl: 'https://rpc-c5.crypto.org',
-      proxyUrl: 'https://rest-c5.crypto.org',
+      nodeUrl: 'https://rpc-c5.cronos-pos.org',
+      clientUrl: 'https://rpc-c5.cronos-pos.org',
+      proxyUrl: 'https://rest-c5.cronos-pos.org',
       indexingUrl: 'https://cronos-pos.org/explorer/croeseid5/api/v1/',
       chainId: 'testnet-croeseid-5'
     });
