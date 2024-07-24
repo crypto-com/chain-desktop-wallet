@@ -69,7 +69,7 @@ jobs:
         # Import Apple API key for app notarization on macOS
         run: |
           mkdir -p ~/private_keys/
-          echo '${{ secrets.mac_api_key }}' > ~/private_keys/AuthKey_${{ secrets.mac_api_key_id }}.p8
+          echo '${{ secrets.mac_api_key_2024 }}' > ~/private_keys/AuthKey_${{ secrets.mac_api_key_id_2024 }}.p8
 
       - name: Check notarytool
         run: xcrun notarytool help
