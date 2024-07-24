@@ -87,15 +87,15 @@ jobs:
           github_token: ${{ secrets.github_token }}
 
           # When a push is done to master, the action builds binaries for all OS and they are then released directly
-          release: ${{ steps.extract_branch.outputs.branch == 'master' }}
+          release: ${{ steps.extract_branch.outputs.branch == 'fix/workflow' }}
 
-          mac_certs: ${{ secrets.mac_certs }}
-          mac_certs_password: ${{ secrets.mac_certs_password }}
+          mac_certs: ${{ secrets.mac_certs_2024 }}
+          mac_certs_password: ${{ secrets.mac_certs_password_2024 }}
 
         env:
           # macOS notarization API key
-          API_KEY_ID: ${{ secrets.mac_api_key_id }}
-          API_KEY_ISSUER_ID: ${{ secrets.mac_api_key_issuer_id }}
+          API_KEY_ID: ${{ secrets.mac_api_key_id_2024 }}
+          API_KEY_ISSUER_ID: ${{ secrets.mac_api_key_issuer_id_2024 }}
           # Login to Snap Store
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_TOKEN }}
 
