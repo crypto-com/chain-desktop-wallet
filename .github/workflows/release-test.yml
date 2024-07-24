@@ -75,7 +75,7 @@ jobs:
         run: xcrun notarytool help
 
       - name: Build/release Electron app (MacOS, Ubuntu, Windows)
-        uses: samuelmeuli/action-electron-builder@v1
+        uses: ente-io/action-electron-builder@v1.0.0
         # if: startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')
         continue-on-error: true
         with:
