@@ -64,12 +64,12 @@ jobs:
           echo version: ${{ steps.package_json.outputs.version }}
           echo "********* END RELEASE REF ************"
 
-      # - name: Prepare for app notarization (MacOS)
-      #   if: startsWith(matrix.os, 'macos')
-      #   # Import Apple API key for app notarization on macOS
-      #   run: |
-      #     mkdir -p ~/private_keys/
-      #     echo '${{ secrets.mac_api_key_2024 }}' > ~/private_keys/AuthKey_${{ secrets.mac_api_key_id_2024 }}.p8
+      - name: Prepare for app notarization (MacOS)
+        if: startsWith(matrix.os, 'macos')
+        # Import Apple API key for app notarization on macOS
+        run: |
+          mkdir -p ~/private_keys/
+          echo '${{ secrets.mac_api_key_2024 }}' > ~/private_keys/AuthKey_${{ secrets.mac_api_key_id_2024 }}.p8
 
       - name: Check notarytool
         run: xcrun notarytool help
@@ -94,8 +94,9 @@ jobs:
 
         env:
           # macOS notarization API key
-          API_KEY_ID: ${{ secrets.mac_api_key_id_2024 }}
-          API_KEY_ISSUER_ID: ${{ secrets.mac_api_key_issuer_id_2024 }}
+          APPLE_API_KEY: ${{ secrets.mac_api_key_2024 }}
+          APPLE_API_KEY_ID: ${{ secrets.mac_api_key_id_2024 }}
+          APPLE_API_KEY_ISSUER: ${{ secrets.mac_api_key_issuer_id_2024 }}
           # Login to Snap Store
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_TOKEN }}
 
