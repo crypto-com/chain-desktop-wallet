@@ -71,9 +71,6 @@ jobs:
           mkdir -p ~/private_keys/
           echo '${{ secrets.mac_api_key_2024 }}' > ~/private_keys/AuthKey_${{ secrets.mac_api_key_id_2024 }}.p8
 
-      - name: Check notarytool
-        run: xcrun notarytool help
-
       - name: Build/release Electron app (MacOS, Ubuntu, Windows)
         uses: ente-io/action-electron-builder@v1.0.0
         # if: startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')
