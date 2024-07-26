@@ -38,10 +38,10 @@ jobs:
         # Only install Snapcraft on Ubuntu
         if: startsWith(matrix.os, 'ubuntu')
 
-      # - name: Install AzureSignTool
-      #  # Only install Azure Sign Tool on Windows
-      #   if: startsWith(matrix.os, 'windows')
-      #   run: dotnet tool install --global AzureSignTool
+      - name: Install AzureSignTool
+       # Only install Azure Sign Tool on Windows
+        if: startsWith(matrix.os, 'windows')
+        run: dotnet tool install --global AzureSignTool
 
       - name: Extract current branch name
         shell: bash
@@ -108,7 +108,7 @@ jobs:
       - name: Build Electron app (Windows)
         if: startsWith(matrix.os, 'windows')
         run: |
-          yarn run electron:build
+          yarn run electron:winbuild
 
       - name: Sign built binary (Windows)
         if: startsWith(matrix.os, 'windows')
