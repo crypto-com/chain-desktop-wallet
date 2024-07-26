@@ -14,7 +14,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
+        os: [macos-12-large, ubuntu-latest, windows-latest]
 
     steps:
       - name: setup dependencies
@@ -72,7 +72,7 @@ jobs:
           echo '${{ secrets.mac_api_key_2024 }}' > ~/private_keys/AuthKey_${{ secrets.mac_api_key_id_2024 }}.p8
 
       - name: Build/release Electron app (MacOS, Ubuntu, Windows)
-        uses: ente-io/action-electron-builder@v1.0.0
+        uses: samuelmeuli/action-electron-builder@v1
         # if: startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')
         continue-on-error: true
         with:
