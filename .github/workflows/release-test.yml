@@ -96,7 +96,7 @@ jobs:
           # macOS notarization API key
           APPLE_API_KEY: ~/private_keys/AuthKey_${{ secrets.mac_api_key_id_2024 }}.p8
           APPLE_API_KEY_ID: ${{ secrets.mac_api_key_id_2024 }}
-          APPLE_API_KEY_ISSUER: ${{ secrets.mac_api_key_issuer_id_2024 }}
+          APPLE_API_ISSUER: ${{ secrets.mac_api_key_issuer_id_2024 }}
           # Login to Snap Store
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_TOKEN }}
 
