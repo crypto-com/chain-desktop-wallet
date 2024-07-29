@@ -68,7 +68,7 @@
     "electron-log": "4.3.5",
     "electron-reload": "1.5.0",
     "electron-store": "8.0.1",
-    "electron-updater": "6.3.0-alpha.6",
+    "electron-updater": "6.3.0",
     "eth-sig-util": "3.0.1",
     "ethereumjs-tx": "2.1.2",
     "ethers": "5.4.4",
