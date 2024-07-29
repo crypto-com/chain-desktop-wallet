@@ -273,7 +273,8 @@
         "pkg"
       ],
       "category": "public.app-category.utilities",
-      "darkModeSupport": true
+      "darkModeSupport": true,
+      "notarize": true
     },
     "linux": {
       "category": "Utility"
