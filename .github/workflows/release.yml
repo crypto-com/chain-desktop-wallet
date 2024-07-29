@@ -14,7 +14,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
+        os: [macos-12-large, ubuntu-latest, windows-latest]
 
     steps:
       - name: setup dependencies
@@ -38,10 +38,10 @@ jobs:
         # Only install Snapcraft on Ubuntu
         if: startsWith(matrix.os, 'ubuntu')
 
-      # - name: Install AzureSignTool
-      #  # Only install Azure Sign Tool on Windows
-      #   if: startsWith(matrix.os, 'windows')
-      #   run: dotnet tool install --global AzureSignTool
+      - name: Install AzureSignTool
+       # Only install Azure Sign Tool on Windows
+        if: startsWith(matrix.os, 'windows')
+        run: dotnet tool install --global AzureSignTool
 
       - name: Extract current branch name
         shell: bash
@@ -69,11 +69,12 @@ jobs:
         # Import Apple API key for app notarization on macOS
         run: |
           mkdir -p ~/private_keys/
-          echo '${{ secrets.mac_api_key }}' > ~/private_keys/AuthKey_${{ secrets.mac_api_key_id }}.p8
+          echo '${{ secrets.mac_api_key_2024 }}' > ~/private_keys/AuthKey_${{ secrets.mac_api_key_id_2024 }}.p8
 
       - name: Build/release Electron app (MacOS, Ubuntu, Windows)
         uses: samuelmeuli/action-electron-builder@v1
         # if: startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')
+        continue-on-error: true
         with:
 
           build_script_name: electron:pre-build
@@ -85,20 +86,29 @@ jobs:
           # When a push is done to master, the action builds binaries for all OS and they are then released directly
           release: ${{ steps.extract_branch.outputs.branch == 'master' }}
 
-          mac_certs: ${{ secrets.mac_certs }}
-          mac_certs_password: ${{ secrets.mac_certs_password }}
+          mac_certs: ${{ secrets.mac_certs_2024 }}
+          mac_certs_password: ${{ secrets.mac_certs_password_2024 }}
 
         env:
           # macOS notarization API key
-          API_KEY_ID: ${{ secrets.mac_api_key_id }}
-          API_KEY_ISSUER_ID: ${{ secrets.mac_api_key_issuer_id }}
+          APPLE_API_KEY: ~/private_keys/AuthKey_${{ secrets.mac_api_key_id_2024 }}.p8
+          APPLE_API_KEY_ID: ${{ secrets.mac_api_key_id_2024 }}
+          APPLE_API_KEY_ISSUER: ${{ secrets.mac_api_key_issuer_id_2024 }}
+          APPLE_API_ISSUER: ${{ secrets.mac_api_key_issuer_id_2024 }}
           # Login to Snap Store
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_TOKEN }}
-          
+
+      - name: Upload notarization-error.log
+        uses: actions/upload-artifact@v2
+        if: startsWith(matrix.os, 'macos')
+        with:
+          name: notarization-error.log
+          path: /Users/runner/work/chain-desktop-wallet/chain-desktop-wallet/notarization-error.log
+
       - name: Build Electron app (Windows)
         if: startsWith(matrix.os, 'windows')
         run: |
-          yarn run electron:build
+          yarn run electron:winbuild
 
       - name: Sign built binary (Windows)
         if: startsWith(matrix.os, 'windows')
