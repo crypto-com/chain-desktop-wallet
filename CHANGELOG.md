@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 ### Additions
 - Security enhancement on DApp Browser
 - web3 library dependencies bump
+- Transit to upgraded indexing services
 ## [v1.5.0] - 2024-03-12
 ### Additions
 - Security enhancement on DApp Browser
