@@ -5,9 +5,9 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
-## [v1.5.1] - 2024-07-05
+## [v1.5.1] - 2024-07-29
 ### Additions
-- Security enhancement on DApp Browser
+- Security enhancement
 - web3 library dependencies bump
 - Transit to upgraded indexing services
 ## [v1.5.0] - 2024-03-12
