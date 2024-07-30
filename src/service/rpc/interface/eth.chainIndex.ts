@@ -15,6 +15,9 @@ export interface balanceQueryBaseParams {
   token?: string;
   apikey?: string;
   contract_addresses: string;
+  page?: number | 1;
+  pageSize?: number | 10;
+  session?: string;
 }
 
 export interface IEthChainIndexAPI {
