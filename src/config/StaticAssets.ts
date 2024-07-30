@@ -235,8 +235,8 @@ export const ETH_ASSET = (walletConfig: WalletConfig) => {
 
     fee: { gasLimit: '50000', networkFee: '20000000000' },
     indexingUrl: isTestnet
-      ? 'https://eth-indexing.crypto.org/ethereum/goerli/api/v1'
-      : 'https://eth-indexing.crypto.org/ethereum/mainnet/api/v1',
+      ? 'https://eth-indexing.crypto.org/ethereum/goerli/api/v2'
+      : 'https://eth-indexing.crypto.org/ethereum/mainnet/api/v2',
     isLedgerSupportDisabled: false,
     isStakingDisabled: false,
     nodeUrl: isTestnet

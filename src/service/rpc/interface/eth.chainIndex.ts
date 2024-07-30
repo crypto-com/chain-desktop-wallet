@@ -14,6 +14,7 @@ export interface txQueryBaseParams {
 export interface balanceQueryBaseParams {
   token?: string;
   apikey?: string;
+  contract_addresses: string;
 }
 
 export interface IEthChainIndexAPI {

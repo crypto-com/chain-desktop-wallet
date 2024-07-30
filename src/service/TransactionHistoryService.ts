@@ -40,6 +40,7 @@ import { croMarketPriceApi } from './rpc/MarketApi';
 import { CronosNftIndexingAPI } from './rpc/indexing/nft/cronos/CronosNftIndexingAPI';
 import {
   checkIfTestnet,
+  getAllERC20WhiteListedAddress,
   getCronosEvmAsset,
   isCRC20AssetWhitelisted,
   isERC20AssetWhitelisted,
@@ -334,18 +335,19 @@ export class TransactionHistoryService {
       const txList = await ethClient.getTxsByAddress(currentAsset.address);
 
       const loadedTxList = txList
-        .filter(
-          tx =>
-            tx.token_symbol === 'ETH' &&
-            (tx.type?.toLowerCase() === EthereumTransactionType.TRANSFER ||
-              tx.type?.toLowerCase() === EthereumTransactionType.UTF8TRANSFER),
-        )
+        // .filter(
+        //   tx =>
+        //     tx.method_id === ''
+        //     // tx.token_symbol === 'ETH' &&
+        //     // (tx.type?.toLowerCase() === EthereumTransactionType.TRANSFER ||
+        //     //   tx.type?.toLowerCase() === EthereumTransactionType.UTF8TRANSFER),
+        // )
         .map(tx => {
           const transferTx: TransferTransactionData = {
-            amount: tx.amount,
-            assetSymbol: tx.token_symbol,
+            amount: tx.value,
+            assetSymbol: 'ETH',
             date: new Date(Number(tx.timestamp) * 1000).toISOString(),
-            hash: tx.transaction_hash,
+            hash: tx.hash,
             memo: '',
             receiverAddress: tx.to,
             senderAddress: tx.from,
@@ -356,7 +358,7 @@ export class TransactionHistoryService {
             walletId: walletIdentifier,
             assetId: currentAsset.identifier,
             assetType: currentAsset.assetType,
-            txHash: tx.transaction_hash,
+            txHash: tx.hash,
             txType: EthereumTransactionType.TRANSFER,
             txData: transferTx,
             // TODO: add messageTypeName
@@ -860,9 +862,9 @@ export class TransactionHistoryService {
 
     const ethClient = new EthClient(ethEvmAsset.config?.nodeUrl, ethEvmAsset.config?.indexingUrl);
 
-    // const allWhiteListedTokens = getAllERC20WhiteListedAddress();
+    const allWhiteListedTokens = getAllERC20WhiteListedAddress();
     const tokensListResponse = await ethClient.getBalanceByAddress(address, {
-      // token: allWhiteListedTokens.slice(0, 20).join(','),
+      contract_addresses: allWhiteListedTokens.slice(0, 20).join(','),
     });
     const newlyLoadedTokens = await tokensListResponse
       .filter(token => token.balance > 0 && token.token_addr !== 'ETH')
@@ -941,9 +943,9 @@ export class TransactionHistoryService {
             if (asset.name.includes('Cronos')) {
               await this.fetchCurrentWalletCRC20Tokens(asset, currentSession);
             }
-            if (asset.name.includes('Ethereum')) {
-              await this.fetchCurrentWalletERC20Tokens(asset, currentSession);
-            }
+            // if (asset.name.includes('Ethereum')) {
+            //   await this.fetchCurrentWalletERC20Tokens(asset, currentSession);
+            // }
             break;
           default:
             break;
