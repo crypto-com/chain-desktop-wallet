@@ -91,7 +91,6 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
       const txDataList = await this.getTxsByAddressPaginated(address, {
         pageSize: limit,
         page: currentPage,
-        sort: 'timestamp:desc',
       });
 
       // Append TxData list to the final response array
