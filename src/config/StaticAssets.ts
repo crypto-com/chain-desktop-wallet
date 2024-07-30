@@ -11,9 +11,9 @@ import { TestNetCroeseid5Config, MainNetConfig } from './StaticConfig';
 export const STATIC_ASSET_COUNT = 4;
 
 // Update Explorer Url - https://cronoscan.com
-export const MAINNET_EVM_EXPLORER_URL = 'https://cronoscan.com';
+export const MAINNET_EVM_EXPLORER_URL = 'https://explorer.cronos.org';
 // There's no testnet explorer on cronoscan.com. Use cronos.org/explorer instead.
-export const TESTNET_EVM_EXPLORER_URL = 'https://cronos.org/explorer/testnet3';
+export const TESTNET_EVM_EXPLORER_URL = 'https://explorer.cronos.org/testnet';
 
 export const MAINNET_ETHEREUM_EXPLORER_URL = 'https://etherscan.io';
 export const ROPSTEN_ETHEREUM_EXPLORER_URL = 'https://ropsten.etherscan.io';
@@ -235,8 +235,8 @@ export const ETH_ASSET = (walletConfig: WalletConfig) => {
 
     fee: { gasLimit: '50000', networkFee: '20000000000' },
     indexingUrl: isTestnet
-      ? 'https://eth-indexing.crypto.org/ethereum/goerli/api/v1'
-      : 'https://eth-indexing.crypto.org/ethereum/mainnet/api/v1',
+      ? 'https://eth-indexing.crypto.org/ethereum/goerli/api/v2'
+      : 'https://eth-indexing.crypto.org/ethereum/mainnet/api/v2',
     isLedgerSupportDisabled: false,
     isStakingDisabled: false,
     nodeUrl: isTestnet

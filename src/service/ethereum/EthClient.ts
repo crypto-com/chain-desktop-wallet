@@ -41,7 +41,7 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
   getETHBalanceByAddress = async (address: string): Promise<string> => {
     const balanceResponse: AxiosResponse<BalancesByAddressResponse> = await axios({
       baseURL: this.indexingBaseUrl,
-      url: `/address/${address.toLowerCase()}/balance`,
+      url: `/addresses/${address.toLowerCase()}/native_balance`,
     });
 
     if (balanceResponse.status !== 200) {
@@ -62,7 +62,7 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
   getBalanceByAddress = async (address: string, options?: balanceQueryBaseParams) => {
     const balanceResponse: AxiosResponse<BalancesByAddressResponse> = await axios({
       baseURL: this.indexingBaseUrl,
-      url: `/address/${address.toLowerCase()}/balance`,
+      url: `/addresses/${address.toLowerCase()}/token_balance`,
       params: { ...options },
     });
 
@@ -79,7 +79,7 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
 
   getTxsByAddress = async (address: string, options?: txQueryBaseParams) => {
     // Pagination params
-    let currentPage = options?.page || 0;
+    let currentPage = options?.page || 1;
     const limit = options?.pageSize || 100;
 
     // Result
@@ -91,7 +91,6 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
       const txDataList = await this.getTxsByAddressPaginated(address, {
         pageSize: limit,
         page: currentPage,
-        sort: 'timestamp:desc',
       });
 
       // Append TxData list to the final response array
@@ -111,7 +110,7 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
   private getTxsByAddressPaginated = async (address: string, options?: txQueryBaseParams) => {
     const txListResponse: AxiosResponse<TransactionsByAddressResponse> = await axios({
       baseURL: this.indexingBaseUrl,
-      url: `/address/${address.toLowerCase()}/normal`,
+      url: `/addresses/${address.toLowerCase()}/transactions`,
       params: { ...options },
     });
 
@@ -134,4 +133,54 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
   getInternalTxsByAddress(address: string, options?: any) {
     throw new Error('Method not implemented.');
   }
+
+
+  getERC20TransfersByAddress = async (address: string, options?: txQueryBaseParams) => {
+    // Pagination params
+    let currentPage = options?.page || 1;
+    const limit = options?.pageSize || 100;
+
+    // Result
+    const finalList: TransactionData[] = [];
+
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      // eslint-disable-next-line
+      const txDataList = await this.getERC20TransfersByAddressPaginated(address, {
+        pageSize: limit,
+        page: currentPage,
+        sort: 'timestamp:desc',
+      });
+
+      // Append TxData list to the final response array
+      finalList.push(...txDataList);
+
+      // Increment pagination params
+      currentPage += 1;
+
+      if (txDataList.length < 1 || txDataList.length < limit) {
+        break;
+      }
+    }
+
+    return finalList;
+  };
+
+  private getERC20TransfersByAddressPaginated = async (address: string, options?: txQueryBaseParams) => {
+    const txListResponse: AxiosResponse<TransactionsByAddressResponse> = await axios({
+      baseURL: this.indexingBaseUrl,
+      url: `/addresses/${address.toLowerCase()}/transfers`,
+      params: { ...options },
+    });
+
+    if (txListResponse.status !== 200) {
+      return [];
+    }
+
+    if (!txListResponse.data.data) {
+      return [];
+    }
+
+    return txListResponse.data.data as TransactionData[];
+  };
 }

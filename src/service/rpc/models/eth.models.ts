@@ -22,22 +22,36 @@ export interface TransactionsByAddressResponse {
 }
 
 export interface TransactionData {
-  transaction_hash: string;
-  signer: string[];
+  block_hash: string;
+  block_number: number;
+  call_error: string;
+  contract_creation: boolean;
   from: string;
-  to: string;
-  amount: string;
-  decimal: number;
-  token_addr: string;
-  token_name: string;
-  token_symbol: string;
-  type: string;
-  failed: boolean;
-  fail_reason: null;
-  timestamp: string;
-  block: number;
-  transaction_index: number;
-  log_index: number;
-  gas_price: number;
+  from_metadata: {
+    is_contract: boolean;
+  }
+  gas_limit: number;
+  gas_price: string;
   gas_used: number;
+  hash: string;
+  index: number;
+  method_id: string;
+  method_name: string;
+  nonce: number;
+  status: number;
+  timestamp: number;
+  to: string;
+  to_metadata: {
+    is_contract: boolean;
+  }
+  type: number;
+  value: string;
+  decimal?: number;
+  fail_reason?: null;
+  failed?: boolean;
+  log_index?: number;
+  signer?: string[];
+  token_addr?: string;
+  token_name?: string;
+  token_symbol?: string;
 }
