@@ -345,8 +345,6 @@ function HomeLayout(props: HomeLayoutProps) {
       : MAINNET_ETHEREUM_EXPLORER_URL;
 
     setTimeout(async () => {
-
-      console.log('checkCorrectExplorerUrl', cronosTendermintAsset?.config?.explorerUrl, checkDefaultCronosPosExplorerUrl);
       if (
         !walletSession.activeAsset?.config?.explorer ||
         // Check if explorerUrl has been updated with latest default
