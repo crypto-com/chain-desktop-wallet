@@ -1,4 +1,4 @@
-## Coordinated Vulnerability Disclosure Policy
+SECURITY.md ## Coordinated Vulnerability Disclosure Policy
 We ask security researchers to keep vulnerabilities and communications around vulnerability submissions private and confidential until a patch is developed to protect the people using Crypto.com protocols. In addition to this, we ask that you:
 
 - Allow us a reasonable amount of time to correct or address security vulnerabilities.
