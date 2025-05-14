@@ -83,9 +83,9 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
     const keyPair = Secp256k1KeyPair.fromPrivKey(dummyPrivateKey);
 
     let { memo } = transaction;
-    memo = memo.replace('&', '_');
-    memo = memo.replace('<', '_');
-    memo = memo.replace('>', '_');
+    memo = memo.replace(/&/g, '_');
+    memo = memo.replace(/</g, '_');
+    memo = memo.replace(/>/g, '_');
     rawTx.setMemo(memo);
 
     const fee = new cro.Coin(gasFee, Units.BASE);
