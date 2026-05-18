@@ -43,7 +43,7 @@ export interface TransactionData {
   to: string;
   to_metadata: {
     is_contract: boolean;
-  }
+  };
   type: number;
   value: string;
   decimal?: number;
