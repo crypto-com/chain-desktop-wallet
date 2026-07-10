@@ -25,9 +25,22 @@ export const CronosTestnetChainConfig: EVMChainConfig = {
   }
 };
 
+export const Chain138MainnetChainConfig: EVMChainConfig = {
+  chainId: '0x8a',
+  chainName: 'DeFi Oracle Meta Mainnet',
+  blockExplorerUrls: ['https://blockscout.defi-oracle.io'],
+  rpcUrls: ['https://rpc.public-0138.defi-oracle.io'],
+  nativeCurrency: {
+    decimals: 18,
+    name: 'Ether',
+    symbol: 'ETH'
+  }
+};
+
 export const DAppDefaultChainConfigs = [
   CronosMainnetChainConfig,
   CronosTestnetChainConfig,
+  Chain138MainnetChainConfig,
   // {
   //   chainId: "0x01",
   //   chainName: "Ethereum Mainnet",
